@@ -1,5 +1,15 @@
 # Estudo de Caso 09: Motor de Fluxo Editorial Concorrente com Máquinas de Estado Formais
 
+<p align="left">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" alt="Jest" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso documenta o projeto e desenvolvimento de um microsserviço editorial orientado a eventos responsável por governar o ciclo de vida de publicações técnicas: da redação inicial e colaboração entre autores até a revisão de tutores regionais, ajustes formais e publicação definitiva. Construído com Node.js e PostgreSQL, o serviço adota uma máquina de estados finitos (FSM) apoiada por controles de concorrência transacionais para coordenar fluxos com múltiplos participantes.
 

@@ -1,5 +1,16 @@
 # Estudo de Caso 01: Motor Gráfico de Matrizes Curriculares e Quadro Branco Colaborativo
 
+<p align="left">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso aborda a engenharia de uma plataforma educacional de planejamento acadêmico, projetada para representar matrizes curriculares do ensino superior como grafos acíclicos dirigidos (DAGs) interativos, complementada por um quadro branco colaborativo infinito para planejamento visual de estudos. Desenvolvido como um monorepo TypeScript com npm workspaces, o sistema integra uma API em Express e Prisma de alta capacidade a um cliente responsivo em React 19 e Vite.
 

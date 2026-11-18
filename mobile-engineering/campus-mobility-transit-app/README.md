@@ -1,5 +1,15 @@
 # Estudo de Caso 04: Aplicativo Mobile de Rastreamento de Frotas com Preservação de Privacidade
 
+<p align="left">
+  <img src="https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React Native" />
+  <img src="https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white" alt="Expo" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android" />
+  <img src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" alt="Jest" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso abrange a arquitetura frontend e mobile de uma aplicação multiplataforma em produção desenvolvida com React Native e Expo para milhares de usuários ativos diários. O aplicativo funciona como uma plataforma integrada de mobilidade e serviços institucionais, reunindo rastreamento de frotas de transporte em tempo real, linhas do tempo de paradas, cardápios de restaurantes universitários, feeds de notícias e lembretes de horários personalizados.
 

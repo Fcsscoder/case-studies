@@ -1,5 +1,13 @@
 # Estudo de Caso 14: Simulação Educacional Isométrica 2D sem Dependência de Imagens Externas
 
+<p align="left">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso documenta o projeto e desenvolvimento de um jogo educacional 2D com perspectiva isométrica, criado para treinamento de agentes comunitários de saúde na Atenção Primária. Executada unicamente com tecnologias nativas do navegador (React e HTML5 Canvas 2D), a simulação desenha 100% de seus elementos visuais, personagens e cenários de forma procedural via código, acompanhada por trilha sonora sintetizada em tempo real pela Web Audio API.
 

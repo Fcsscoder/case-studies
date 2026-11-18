@@ -1,5 +1,15 @@
 # Estudo de Caso 07: Ingestão Escalável de Prontuários Clínicos e Sanitização de Dados Sensíveis (PII)
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white" alt="Nginx" />
+  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso documenta a modernização arquitetural, o reforço de privacidade e a otimização de desempenho de uma plataforma de monitoramento epidemiológico e gestão em saúde básica. Operando em produção sobre servidores virtuais Linux (VPS), a plataforma ingere cadastros municipais volumosos de cidadãos, monitora indicadores da Atenção Primária (como hipertensão, diabetes, pré-natal e exames preventivos) e gera relatórios operacionais para as equipes de saúde da família.
 

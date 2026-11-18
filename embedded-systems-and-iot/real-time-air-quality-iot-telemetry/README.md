@@ -1,5 +1,15 @@
 # Estudo de Caso 10: Firmware para Telemetria Ambiental e Painel em Tempo Real Orientado a Eventos
 
+<p align="left">
+  <img src="https://img.shields.io/badge/C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white" alt="C++" />
+  <img src="https://img.shields.io/badge/Arduino-00979D?style=for-the-badge&logo=arduino&logoColor=white" alt="Arduino" />
+  <img src="https://img.shields.io/badge/MQTT-660066?style=for-the-badge&logo=mqtt&logoColor=white" alt="MQTT" />
+  <img src="https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso documenta o desenvolvimento de um ecossistema integrado de monitoramento de qualidade do ar baseado em Internet das Coisas (IoT). O projeto é formado por um firmware embarcado em C++ executado em um microcontrolador ESP32, um broker MQTT Eclipse Mosquitto, um serviço ouvinte de auditoria e um painel web em Node.js com renderização no servidor (SSR) e transmissão contínua de telemetria via Server-Sent Events (SSE).
 

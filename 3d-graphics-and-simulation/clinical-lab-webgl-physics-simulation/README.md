@@ -1,5 +1,16 @@
 # Estudo de Caso 02: Laboratório Clínico Virtual 3D em WebGL com Simulação Física em Primeira Pessoa
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white" alt="Three.js" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/WebGL-990000?style=for-the-badge&logo=webgl&logoColor=white" alt="WebGL" />
+  <img src="https://img.shields.io/badge/WebAssembly-654FF0?style=for-the-badge&logo=webassembly&logoColor=white" alt="WebAssembly" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white" alt="Playwright" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso documenta o projeto e desenvolvimento de uma simulação de laboratório virtual 3D interativa em WebGL, concebida para treinamento em primeira pessoa em protocolos de imuno-hematologia laboratorial. Executada inteiramente no navegador via WebGL2 sem necessidade de servidores de streaming ou infraestrutura remota, a aplicação simula a manipulação física de tubos de ensaio, a operação de instrumentos analíticos (centrífugas, incubadoras e balanças de precisão) e a análise visual em tempo real de reações de aglutinação.
 

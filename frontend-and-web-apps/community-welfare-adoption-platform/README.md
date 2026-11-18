@@ -1,5 +1,16 @@
 # Estudo de Caso 13: Sistema Full-Stack para Gestão de Adoções e Bem-Estar Comunitário
 
+<p align="left">
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white" alt="Nginx" />
+  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" alt="GitHub Actions" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso detalha a concepção, desenvolvimento e publicação em nuvem de uma aplicação web full-stack criada para coordenar ações voluntárias de proteção animal, triagem de pedidos de adoção e acompanhamento de campanhas de doação. Desenvolvida com frontend em React e backend em Node.js, Express e MongoDB, a plataforma conta com painel administrativo, troca de mensagens, etapas de avaliação e deploy contínuo baseado em contêineres Docker.
 

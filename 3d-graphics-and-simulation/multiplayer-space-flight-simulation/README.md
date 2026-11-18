@@ -1,5 +1,15 @@
 # Estudo de Caso 12: Motor de Simulação Espacial Cooperativa Multiusuário em Tempo Real
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white" alt="Three.js" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white" alt="Socket.io" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso analisa o desenvolvimento de um motor de simulação cooperativa multiusuário em tempo real com temática de exploração espacial. Criada no contexto de um hackathon internacional de tecnologia e espaço, a aplicação web viabiliza que equipes de 1 a 4 pessoas administrem juntas o suporte de vida, as reservas energéticas e incursões de superfície em uma base simulada.
 

@@ -1,5 +1,15 @@
 # Estudo de Caso 11: Plataforma Comercial com Arquitetura em Camadas e Análise de Faturamento
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" />
+  <img src="https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso aborda o desenvolvimento de uma plataforma de gestão de estoque e análise de vendas voltada para dispositivos móveis, construída com Next.js 15 (App Router), React 19, TypeScript e Prisma ORM. Projetado sob uma arquitetura limpa em quatro camadas desacopladas, o sistema centraliza o controle de catálogo, ajustes flexíveis de preços, histórico de transações e painéis com métricas mensais de faturamento.
 

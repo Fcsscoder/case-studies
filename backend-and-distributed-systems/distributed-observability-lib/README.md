@@ -1,5 +1,14 @@
 # Estudo de Caso 03: Biblioteca de Rastreamento Distribuído e Logs Estruturados para Node.js
 
+<p align="left">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" alt="Jest" />
+  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso detalha a arquitetura e implementação de uma biblioteca interna de rastreamento distribuído, propagação de contexto de correlação e telemetria estruturada (`observability-lib`) para microsserviços Node.js. Projetada como um módulo central com zero dependências externas extras e distribuída entre repositórios internos, a biblioteca padroniza a formatação de logs, o tratamento de erros e as sondagens de saúde de contêineres em serviços desacoplados.
 

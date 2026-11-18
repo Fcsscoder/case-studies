@@ -1,5 +1,15 @@
 # Estudo de Caso 06: Pipeline Tolerante a Falhas para Ingestão de Documentos e Gateway Blindado
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white" alt="Nginx" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso aborda a engenharia de um pipeline automatizado e tolerante a falhas integrado a um gateway de proxy reverso. O sistema foi projetado para extrair, validar e sincronizar informações contidas em publicações institucionais não estruturadas (tabelas semanais em PDF de múltiplas colunas, pastas em nuvem e feeds de portais) em uma base de dados MongoDB de alta velocidade.
 

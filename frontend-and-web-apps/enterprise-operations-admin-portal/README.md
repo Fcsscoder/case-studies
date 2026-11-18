@@ -1,5 +1,15 @@
 # Estudo de Caso 05: Portal Corporativo Multi-Tenant com Rastreamento de Erros Cliente-Servidor
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white" alt="Playwright" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso analisa o desenvolvimento de um portal web corporativo construído com Next.js e TypeScript, projetado para coordenar fluxos administrativos de múltiplos setores. A plataforma gerencia horários de transporte em tempo real, escalas de frotas e motoristas, cardápios de restaurantes universitários, banners dinâmicos e comunicados oficiais sob controle de acesso baseado em departamentos.
 

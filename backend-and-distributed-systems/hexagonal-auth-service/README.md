@@ -1,5 +1,16 @@
 # Estudo de Caso 08: Microsserviço de Gestão de Identidade e Acesso em Arquitetura Hexagonal
 
+<p align="left">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens" alt="JWT" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" alt="Jest" />
+</p>
+
+
 ## 1. Visão Geral
 Este estudo de caso aborda a refatoração de arquitetura, a segurança do ciclo de vida de tokens e os testes de autorização de um microsserviço independente de Gestão de Identidade e Acesso (IAM). Desenvolvido em Node.js e TypeScript, o serviço adota os princípios de Arquitetura Hexagonal (Ports and Adapters) e Clean Architecture, estabelecendo um núcleo de autenticação resiliente e completamente isolado de frameworks web e bancos de dados.
 
