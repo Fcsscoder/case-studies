@@ -1,26 +1,26 @@
-# Case Study 07: Scalable Clinical Record Ingestion & PII Sanitization Architecture
+# Estudo de Caso 07: Ingestão Escalável de Prontuários Clínicos e Sanitização de Dados Sensíveis (PII)
 
-## 1. Overview
-This case study documents the architectural overhaul, privacy hardening, and performance optimization of a healthcare intelligence and epidemiological monitoring platform. Operating in production on Linux virtual private servers, the platform ingests massive municipal health registries, tracks population health indicators (chronic conditions, prenatal care, preventive screenings), and generates operational field schedules for primary care outreach agents.
+## 1. Visão Geral
+Este estudo de caso documenta a modernização arquitetural, o reforço de privacidade e a otimização de desempenho de uma plataforma de monitoramento epidemiológico e gestão em saúde básica. Operando em produção sobre servidores virtuais Linux (VPS), a plataforma ingere cadastros municipais volumosos de cidadãos, monitora indicadores da Atenção Primária (como hipertensão, diabetes, pré-natal e exames preventivos) e gera relatórios operacionais para as equipes de saúde da família.
 
-## 2. Context and Problem
-Managing regional healthcare data requires aggregating records from decentralized primary care clinics into a unified analytical datastore. Health administrators faced two critical technical bottlenecks: first, importing multi-megabyte municipal citizen spreadsheets frequently crashed application servers due to out-of-memory (OOM) memory exhaustion; second, legacy web routes inadvertently exposed Personally Identifiable Information (PII) — specifically national citizen identification numbers (tax IDs) and patient search queries — in plain-text URL paths, reverse-proxy access logs, and persistent browser storage.
+## 2. Contexto e Problema
+A integração de registros de unidades de saúde descentralizadas em uma base analítica centralizada enfrentava dois gargalos críticos: primeiro, a importação de planilhas municipais extensas causava frequentes estouros de memória (Out-Of-Memory / OOM) e derrubava os servidores; segundo, rotas web antigas expunham dados de identificação pessoal (PII), especialmente números de CPF e termos de busca de pacientes, em texto aberto nos caminhos das URLs, nos registros de acesso dos servidores web e no armazenamento local dos navegadores.
 
 ```mermaid
 graph TD
-    ClinicSources["Decentralized Clinic Records<br/>(Massive Multi-MB Registries)"]
-    Streamer["Streaming Ingestion Engine<br/>(O(1) Memory Chunk Processing)"]
-    DB[("Relational Database<br/>(Normalized Identifiers & Composite Indexes)")]
-    Engine["Risk Stratification & Indicator Pipeline<br/>(Automated Batch Runners)"]
+    ClinicSources["Registros Clínicos Descentralizados<br/>(Planilhas e Cadastros Volumosos)"]
+    Streamer["Motor de Ingestão em Streaming<br/>(Processamento com Memória O(1))"]
+    DB[("Banco de Dados Relacional<br/>(Chaves Normalizadas e Índices Compostos)")]
+    Engine["Estratificação de Risco e Indicadores<br/>(Rotinas Periódicas de Cálculo)"]
     
-    subgraph PrivacyShield ["PII Sanitization & Confidentiality Shield"]
-        PathSanitizer["URL Route Sanitizer (Zero PII in Paths)"]
-        LogFilter["Access Log Scrubber (Query Stripping)"]
-        StorageWiper["Client-Side Cache Purge Hooks"]
+    subgraph PrivacyShield ["Barreira de Privacidade e Proteção de PII"]
+        PathSanitizer["Sanitização de Rotas (Zero PII em URLs)"]
+        LogFilter["Filtro de Logs (Expurgo de Parâmetros de Busca)"]
+        StorageWiper["Limpeza Ativa de Cache no Cliente"]
     end
     
-    API["Secure Application API (Strict Token Authentication)"]
-    FieldReports["Printable Field Worklists (Vector PDF)"]
+    API["API Segura da Aplicação (Autenticação Rigorosa)"]
+    FieldReports["Listas Operacionais de Visitas (Relatórios em PDF)"]
 
     ClinicSources --> Streamer
     Streamer --> DB
@@ -30,68 +30,68 @@ graph TD
     API --> FieldReports
 ```
 
-## 3. My Contributions
-- **Engineered O(1) Memory Streaming Ingestion:** Replaced in-memory data loading with a generator-based streaming CSV reader, enabling the ingestion of massive citizen datasets without process memory growth.
-- **Implemented Comprehensive PII Privacy Hardening:** Conducted rigorous privacy sanitization across the entire stack:
-  - Eliminated citizen tax IDs from HTTP URL paths, replacing them with secure payload transfers.
-  - Stripped sensitive query parameters from reverse proxy and application access logs.
-  - Re-engineered frontend search panels to prevent storing patient names or documents in browser `localStorage`.
-- **Built Population Risk Stratification & Indicators Automation:** Implemented algorithms for cross-referencing health registries, identifying high-risk patients lacking timely clinical evaluations, and automated daily calculation runs via bash scripts.
-- **Designed Outreach Field Worklists & PDF Export:** Developed field assignment lists tailored for primary health outreach workers, featuring server-side pagination and exportable PDF field sheets.
-- **Optimized Relational Database Performance:** Introduced normalized indexing schemes, composite indexes on health indicator tables, and eliminated full-table scan bottlenecks.
-- **Hardened Production Deployment Profiles:** Configured Docker Compose production files, resolved host port collisions with existing hospital software running on host ports, and patched automated deployment workflows.
+## 3. Minhas Contribuições
+- **Ingestão em Streaming com Memória Constante O(1):** Substituí leituras que carregavam arquivos inteiros na memória por um leitor de CSV em streaming baseado em geradores Python, permitindo importar bases municipais de qualquer tamanho com consumo plano de memória.
+- **Proteção Completa contra Exposição de PII:** Implementei medidas rigorosas de privacidade em toda a arquitetura do sistema:
+  - Removi números de CPF dos caminhos de URL HTTP, substituindo consultas diretas por envios encapsulados no corpo de requisições autenticadas.
+  - Eliminei parâmetros sensíveis de busca dos logs de acesso do proxy reverso e da aplicação.
+  - Ajustei formulários de busca no frontend para evitar a persistência indevida de dados de pacientes no `localStorage` do navegador.
+- **Automação de Indicadores e Estratificação de Risco:** Programei algoritmos para cruzar registros de saúde, apontar pacientes em faixas prioritárias com pendências de acompanhamento clínico e automatizei execuções diárias via scripts em bash.
+- **Listas de Trabalho de Campo e Exportação em PDF:** Desenvolvi visualizações paginadas no servidor com exportação de relatórios em PDF adaptados para orientar as visitas domiciliares dos agentes de saúde.
+- **Otimização de Consultas no PostgreSQL:** Criei índices compostos e estruturas normalizadas de consulta nas tabelas de indicadores, acabando com travamentos causados por varreduras completas de tabelas (full table scans).
+- **Adequação dos Ambientes de Publicação:** Ajustei manifestos do Docker Compose para produção, solucionei conflitos de portas com outros sistemas de saúde instalados no mesmo servidor e estabilizei as esteiras de deploy.
 
-## 4. Technical Architecture
-The data pipeline processes massive health records while enforcing strict privacy boundaries:
+## 4. Arquitetura Técnica
+O fluxo de dados processa cadastros extensos aplicando barreiras rígidas de proteção:
 
 ```mermaid
 sequenceDiagram
-    participant Admin as Health Official
-    participant API as Application API
-    participant Streamer as Streaming CSV Reader
+    participant Admin as Gestor de Saúde
+    participant API as API da Aplicação
+    participant Streamer as Leitor de CSV em Streaming
     participant DB as PostgreSQL
-    participant Logger as Server Access Logs
+    participant Logger as Logs de Acesso do Servidor
 
-    Admin->>API: POST /api/import/csv (Multi-MB citizen registry)
-    API->>Streamer: Stream binary file chunk by chunk
-    loop Each Batch (O(1) Memory Budget)
-        Streamer->>Streamer: Normalize identifiers & validate records
-        Streamer->>DB: Batch upsert with conflict handling
+    Admin->>API: POST /api/import/csv (Arquivo municipal de cidadãos)
+    API->>Streamer: Transmite binário em blocos sequenciais
+    loop Cada Lote (Consumo de Memória O(1))
+        Streamer->>Streamer: Normaliza campos e valida registros
+        Streamer->>DB: Inserção em lote com resolução de duplicidades
     end
-    DB-->>Streamer: Import complete
-    Streamer-->>API: Summary report
-    Admin->>API: Query citizen record (POST with body payload)
-    API->>Logger: Write sanitized log entry (PII stripped from query)
-    API->>DB: Query via normalized index
-    DB-->>API: Return encrypted patient data
-    API-->>Admin: Render view (wiping search from local storage on exit)
+    DB-->>Streamer: Carga concluída
+    Streamer-->>API: Relatório consolidado
+    Admin->>API: Consulta prontuário (POST com payload seguro)
+    API->>Logger: Registra acesso sem dados sensíveis na rota
+    API->>DB: Consulta indexada otimizada
+    DB-->>API: Retorna dados protegidos do paciente
+    API-->>Admin: Exibe informações (limpando rastro local ao sair)
 ```
 
-## 5. Technology Stack
+## 5. Stack Tecnológica
 - **Backend:** Python, Flask, Gunicorn, PostgreSQL, psycopg2.
-- **Data Processing:** Streaming CSV parsers, PyPDF / ReportLab (field list generation).
-- **Security & Privacy:** PyJWT, Bcrypt, Nginx log sanitization, data privacy compliance.
-- **Infrastructure:** Docker, Docker Compose, Linux VPS, Git.
-- **Code Quality:** Ruff (linting and formatting), OpenAPI specification snapshots.
+- **Processamento de Dados:** Leitores de CSV iterativos, PyPDF / ReportLab (geração de listas em PDF).
+- **Segurança e Privacidade:** PyJWT, Bcrypt, filtros de logs no Nginx, conformidade com a LGPD.
+- **Infraestrutura:** Docker, Docker Compose, VPS Linux, Git.
+- **Qualidade de Código:** Ruff (padronização e linting), validações de contratos OpenAPI.
 
-## 6. Engineering Challenges
-### 1. Out-of-Memory (OOM) Server Crashes During Municipal CSV Imports
-*Problem:* Importing municipal spreadsheets containing tens of thousands of patient records using standard in-memory Pandas/Python readers consumed several gigabytes of RAM, crashing the VPS container.
-*Solution:* Designed an iterative streaming processor using Python generators and chunked buffer reads. Records are read line-by-line, validated, and flushed to PostgreSQL in fixed batch transactions, keeping process memory strictly constant at under 80 MB regardless of file size.
+## 6. Desafios de Engenharia
+### 1. Paradas de Servidor por Estouro de Memória (OOM) na Importação de CSVs
+*Problema:* A leitura de planilhas de municípios com dezenas de milhares de munícipes usando bibliotecas tradicionais que carregam todo o conteúdo na memória exigia vários gigabytes de RAM, derrubando o contêiner do servidor.
+*Solução:* Desenvolvi um pipeline de leitura em streaming utilizando geradores Python que analisa o arquivo linha por linha, valida os dados e envia ao PostgreSQL em lotes transacionais de tamanho fixo. O consumo de memória do processo permanece constante abaixo de 80 MB, independentemente do volume do arquivo.
 
-### 2. Leaking Patient PII in Web Server Access Logs
-*Problem:* Standard REST endpoints like `GET /api/paciente/<cpf>` caused plain-text citizen tax IDs to be written directly to web server access logs and intermediate proxies.
-*Solution:* Restructured all patient-specific retrieval routes to accept identification tokens within encrypted request bodies or authorization headers, and reconfigured logging formatters to systematically strip query strings from access logs.
+### 2. Vazamento de Identificadores de Pacientes em Logs de Acesso Web
+*Problema:* Endpoints comuns como `GET /api/paciente/<cpf>` gravavam o número de CPF do munícipe diretamente nos arquivos de log do servidor Nginx e em proxies intermediários.
+*Solução:* Reestruturei as rotas de consulta para trafegar dados sensíveis apenas em requisições seguras com corpo criptografado ou cabeçalhos autenticados, além de reconfigurar os formatos de log do servidor para suprimir argumentos de consulta.
 
-## 7. Engineering Practices
-- **Strict Data Segregation and Ignoring:** Enforced strict `.gitignore` rules blocking all raw data spreadsheets and municipal text exports from ever entering Git version control.
-- **Automated Regression Auditing:** Maintained continuous automated test suites formatted with Ruff, accompanied by OpenAPI snapshots to prevent API contract breaking changes.
-- **Production Infrastructure Isolation:** Isolated development and production Docker Compose profiles to prevent port collisions with existing hospital software running on host servers.
+## 7. Práticas de Engenharia
+- **Tratamento Rigoroso de Dados no Git:** Definição de regras estritas no `.gitignore` para assegurar que nenhuma planilha bruta ou extração de dados reais jamais entre no versionamento.
+- **Testes Automatizados Contínuos:** Manutenção de testes organizados com Ruff e acompanhados de especificações OpenAPI para prevenir alterações acidentais nos contratos da API.
+- **Isolamento de Infraestrutura em Servidores Compartilhados:** Configuração detalhada das portas e volumes no Docker Compose para evitar sobreposições com serviços legados em execução no servidor.
 
-## 8. Results and Impact
-- **259 verified commits** delivering the ingestion engine, privacy architecture, risk stratification, and production deployment scripts.
-- Processing of municipal citizen registries with zero OOM errors and minimal server memory consumption.
-- Complete compliance with healthcare privacy guidelines and elimination of sensitive citizen identification data from access logs.
+## 8. Resultados e Impacto
+- **259 commits verificados** cobrindo o mecanismo de ingestão, regras de privacidade, rotinas de cálculo de risco e scripts de deploy.
+- Capacidade de carregar grandes bases municipais sem travamentos e com consumo mínimo de recursos.
+- Adequação completa às diretrizes de privacidade da LGPD e fim definitivo do vazamento de documentos em logs.
 
-## 9. My Role
-Lead Systems Engineer and Data Privacy Architect. Designed and implemented the streaming ingestion pipeline, database performance indexing, privacy sanitization measures, and production Docker containerization.
+## 9. Meu Papel
+Engenheiro de Sistemas e Arquiteto de Privacidade de Dados. Projetei e implementei a ingestão em streaming, a otimização de índices no banco de dados, os filtros de sanitização de PII e a infraestrutura de contêineres Docker.

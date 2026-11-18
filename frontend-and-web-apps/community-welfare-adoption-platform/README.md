@@ -1,84 +1,84 @@
-# Case Study 13: Full-Stack Community Welfare & Adoption Management System
+# Estudo de Caso 13: Sistema Full-Stack para Gestão de Adoções e Bem-Estar Comunitário
 
-## 1. Overview
-This case study details the development and cloud deployment of a full-stack web application designed to coordinate community animal welfare initiatives, facilitate pet adoption applications, and streamline charitable donation drives. Built with a React frontend and a Node.js/Express/MongoDB backend, the application features an administrative portal, real-time messaging, review workflows, and automated containerized cloud deployments.
+## 1. Visão Geral
+Este estudo de caso detalha a concepção, desenvolvimento e publicação em nuvem de uma aplicação web full-stack criada para coordenar ações voluntárias de proteção animal, triagem de pedidos de adoção e acompanhamento de campanhas de doação. Desenvolvida com frontend em React e backend em Node.js, Express e MongoDB, a plataforma conta com painel administrativo, troca de mensagens, etapas de avaliação e deploy contínuo baseado em contêineres Docker.
 
-## 2. Context and Problem
-Grassroots community animal protection organizations frequently operate without central software infrastructure, relying on disparate social media groups and private messaging. This leads to lost adoption applications, unvetted caretaker handoffs, and difficulties in coordinating donation tracking. The project sought to provide a centralized platform with structured pet profiles, multi-step adoption vetting workflows, and an administrative oversight panel.
+## 2. Contexto e Problema
+Organizações voluntárias de resgate animal frequentemente atuam sem sistemas estruturados, dependendo de publicações espalhadas em redes sociais e conversas privadas. Essa dinâmica leva à perda de candidaturas de adoção, dificuldades na checagem dos adotantes e falta de controle sobre doações recebidas. O objetivo foi fornecer uma plataforma organizada com fichas detalhadas dos animais, etapas formais de triagem e painel de controle para os administradores.
 
 ```mermaid
 graph TD
-    User["Adopting Citizen / Donor"]
-    Admin["Welfare Administrator"]
-    Nginx["Nginx Reverse Proxy<br/>(SSL & Static Asset Cache)"]
-    Frontend["React Single Page Application<br/>(Tailwind CSS)"]
-    Backend["Node.js / Express API<br/>(Multi-Origin CORS & Auth)"]
-    DB[("MongoDB Relational Clusters")]
-    Volume[("Docker Persistent Storage Volume<br/>(/images/ uploads)")]
+    User["Cidadão Adotante / Doador"]
+    Admin["Administrador da ONG"]
+    Nginx["Proxy Reverso Nginx<br/>(SSL e Cache de Arquivos Estáticos)"]
+    Frontend["Aplicação React Single Page<br/>(Tailwind CSS)"]
+    Backend["API Node.js / Express<br/>(CORS Dinâmico e Autenticação)"]
+    DB[("Clusters de Banco de Dados MongoDB")]
+    Volume[("Volume Docker Persistente<br/>(Uploads de /images/)")]
 
     User --> Nginx
     Admin --> Nginx
     Nginx --> Frontend
-    Nginx -->|/images/ Requests| Volume
-    Nginx -->|/api/ Requests| Backend
+    Nginx -->|Requisições /images/| Volume
+    Nginx -->|Requisições /api/| Backend
     Backend --> DB
     Backend --> Volume
 ```
 
-## 3. My Contributions
-- **Delivered the Core Platform Architecture:** Implemented the complete initial platform architecture (`feat: add full platform`), incorporating user authentication, an administrative control panel, structured pet profile management, adoption application workflows, and notification systems.
-- **Configured Dynamic Multi-Origin CORS:** Engineered flexible CORS middleware supporting comma-separated origin strings from environment variables (`CLIENT_URL`), enabling seamless communication across local development, staging previews, and production domains.
-- **Architected Static Asset Volume Persistence:** Configured Nginx reverse proxy routes and Docker persistent storage volumes to decouple user-uploaded pet photographs (`/images/`) from ephemeral container lifecycles.
-- **Automated Cloud Deployments via GitHub Actions:** Authored automated CI/CD workflows utilizing GitHub Container Registry (GHCR) and automated SSH triggers for hands-off deployment to Oracle Cloud Linux virtual servers.
+## 3. Minhas Contribuições
+- **Estruturação Completa da Plataforma:** Desenvolvi a arquitetura inicial do sistema (`feat: add full platform`), abrangendo autenticação de usuários, painel administrativo, cadastro estruturado de animais, triagem de candidaturas de adoção e avisos.
+- **Configuração de CORS Dinâmico para Múltiplas Origens:** Implementei um middleware flexível que aceita origens separadas por vírgula a partir de variáveis de ambiente (`CLIENT_URL`), permitindo testes seguros em desenvolvimento local, prévias de homologação e produção.
+- **Persistência de Mídias com Volumes Docker:** Configurei rotas no proxy Nginx e volumes persistentes no Docker para desacoplar as imagens enviadas pelos usuários (`/images/`) do ciclo de vida dos contêineres da aplicação.
+- **Automação de Deploys com GitHub Actions:** Estruturei pipelines de integração e entrega contínua com envio de imagens para o GitHub Container Registry (GHCR) e atualização automatizada via SSH em servidores Linux na Oracle Cloud.
 
-## 4. Technical Architecture
-The containerized deployment topology balances web serving and API isolation:
+## 4. Arquitetura Técnica
+A topologia de publicação isola a entrega de arquivos estáticos das rotinas da API:
 
 ```mermaid
 sequenceDiagram
-    participant User as Citizen Applicant
-    participant Nginx as Nginx Reverse Proxy
-    participant API as Express API
+    participant User as Cidadão Adotante
+    participant Nginx as Proxy Reverso Nginx
+    participant API as API Express
     participant DB as MongoDB
-    participant Storage as Persistent Media Volume
+    participant Storage as Volume Persistente de Arquivos
 
-    User->>Nginx: POST /api/adocoes (Submit Adoption Form)
-    Nginx->>API: Forward with CORS Validation
-    API->>DB: Store adoption request (Status: PENDING_REVIEW)
+    User->>Nginx: POST /api/adocoes (Envia formulário de adoção)
+    Nginx->>API: Repassa requisição após validação de CORS
+    API->>DB: Salva pedido de adoção (Status: PENDING_REVIEW)
     API-->>User: HTTP 201 Created
     
-    User->>Nginx: POST /api/pets/upload (Upload pet image)
-    Nginx->>API: Stream multipart image
-    API->>Storage: Persist file to /uploads/images/
-    API->>DB: Associate file path with Pet record
-    DB-->>API: Acknowledged
-    API-->>User: Image uploaded successfully
+    User->>Nginx: POST /api/pets/upload (Envia foto do pet)
+    Nginx->>API: Transmite fluxo da imagem (multipart)
+    API->>Storage: Grava arquivo no caminho /uploads/images/
+    API->>DB: Associa caminho da imagem ao registro do animal
+    DB-->>API: Confirmado
+    API-->>User: Imagem armazenada com sucesso
 ```
 
-## 5. Technology Stack
+## 5. Stack Tecnológica
 - **Backend:** Node.js, Express.js, MongoDB, Mongoose ODM.
 - **Frontend:** React, React Router, Tailwind CSS, JavaScript.
-- **Infrastructure & Proxy:** Docker, Docker Compose, Nginx.
-- **DevOps & Cloud:** GitHub Actions, GHCR (GitHub Container Registry), Oracle Cloud VPS.
+- **Infraestrutura e Proxy:** Docker, Docker Compose, Nginx.
+- **DevOps e Nuvem:** GitHub Actions, GHCR (GitHub Container Registry), VPS Linux na Oracle Cloud.
 
-## 6. Engineering Challenges
-### 1. Cross-Origin Resource Sharing (CORS) Restrictions Across Preview Domains
-*Problem:* Static single-domain CORS configurations broke API access when previewing staging builds on temporary deployment URLs and local network testing devices.
-*Solution:* Implemented dynamic CORS middleware that parses comma-separated allowed origins from the environment, validating incoming request origins against an approved whitelist regex before dispatching headers.
+## 6. Desafios de Engenharia
+### 1. Bloqueios de CORS em Ambientes de Teste Dinâmicos
+*Problema:* Configurações com domínios fixos de CORS impediam o consumo da API durante validações em endereços temporários de homologação ou dispositivos em rede local.
+*Solução:* Programei um middleware customizado que interpreta origens configuradas em variáveis de ambiente e valida a origem das requisições contra uma lista permitida antes de emitir os cabeçalhos de segurança.
 
-### 2. Ephemeral Container Image Loss
-*Problem:* In early Docker deployments, uploaded pet photographs were stored inside the container filesystem, causing all user-uploaded images to be wiped whenever a new container image was deployed.
-*Solution:* Restructured Docker Compose configurations to mount a persistent host volume mapped to the backend's `/uploads` path, and configured Nginx to serve `/images/` directly from the host volume to reduce backend CPU overhead.
+### 2. Perda de Imagens em Atualizações de Contêineres
+*Problema:* Nos primeiros deploys com Docker, as fotos enviadas ficavam no sistema de arquivos interno do contêiner, sendo perdidas a cada nova versão publicada.
+*Solução:* Ajustei os arquivos do Docker Compose para montar volumes persistentes no disco do servidor vinculados à pasta `/uploads`, orientando o Nginx a servir `/images/` diretamente do disco para reduzir a carga sobre o backend.
 
-## 7. Engineering Practices
-- **Strict Environment Isolation:** Maintained exhaustive `.env.example` templates and strict `.gitignore` rules ensuring that secrets, local database dumps, and server keys never enter source repositories.
-- **Automated Continuous Delivery:** Deployed containerized micro-images automatically upon code merges to the main branch via GitHub Actions workflows.
-- **Clean Docker Compose Profiles:** Built independent development and production Compose manifests tailored for rapid local prototyping and hardened production hosting.
+## 7. Práticas de Engenharia
+- **Isolamento de Variáveis de Ambiente:** Modelagem de arquivos `.env.example` completos e filtros no `.gitignore` para assegurar que chaves secretas e configurações de banco nunca cheguem aos repositórios.
+- **Entrega Contínua Automatizada:** Publicação automática de imagens de contêineres a cada commit na branch principal por meio de fluxos do GitHub Actions.
+- **Perfis Limpos de Docker Compose:** Criação de manifestos separados para agilidade no desenvolvimento local e estabilidade em ambientes de produção.
 
-## 8. Results and Impact
-- **12 verified commits** providing the full-stack codebase, administrative review flows, Docker configurations, and automated CI/CD pipelines.
-- Production-ready community animal adoption platform with persistent media storage.
-- Automated zero-downtime container updates on cloud virtual private servers.
+## 8. Resultados e Impacto
+- **12 commits verificados** contendo a estrutura da plataforma, fluxos de avaliação de adoção, arquivos de contêiner e esteiras automatizadas de deploy.
+- Plataforma estável com persistência segura de mídias e fluxo completo de triagem de animais resgatados.
+- Atualização contínua de versões em servidores na nuvem sem paradas manuais de serviço.
 
-## 9. My Role
-Lead Full-Stack Developer and DevOps Engineer. Designed the MongoDB data models, authored the Express backend APIs, developed the React frontend, and built the Docker/Nginx deployment infrastructure.
+## 9. Meu Papel
+Desenvolvedor Full-Stack Líder e Engenheiro DevOps. Projetei os esquemas no MongoDB, desenvolvi as APIs em Express, criei a interface em React e configurei a infraestrutura de publicação com Docker e Nginx.

@@ -1,84 +1,84 @@
-# Case Study 03: High-Throughput Node.js Distributed Tracing & Structured Logging Library
+# Estudo de Caso 03: Biblioteca de Rastreamento Distribuído e Logs Estruturados para Node.js
 
-## 1. Overview
-This case study details the architecture and implementation of an in-house distributed tracing, correlation context propagation, and structured telemetry library (`observability-lib`) for Node.js microservices. Designed as a zero-dependency core module distributed across internal repositories, the library standardizes log formatting, error reporting, and container health probe handling across decoupled services.
+## 1. Visão Geral
+Este estudo de caso detalha a arquitetura e implementação de uma biblioteca interna de rastreamento distribuído, propagação de contexto de correlação e telemetria estruturada (`observability-lib`) para microsserviços Node.js. Projetada como um módulo central com zero dependências externas extras e distribuída entre repositórios internos, a biblioteca padroniza a formatação de logs, o tratamento de erros e as sondagens de saúde de contêineres em serviços desacoplados.
 
-## 2. Context and Problem
-Modern multi-service architectures handling mobile client interactions, asynchronous background workers, and administrative operations frequently suffer from observability fragmentation. Disparate services generate unstructured logs with inconsistent timestamps, lack end-to-end trace correlation across HTTP boundaries, and lose diagnostic context during asynchronous event loops. In addition, high-frequency container health probes flood log aggregation pipelines with redundant successful checks, masking legitimate error signals.
+## 2. Contexto e Problema
+Arquiteturas modernas com múltiplos serviços lidando com clientes móveis, tarefas assíncronas em segundo plano e operações administrativas frequentemente sofrem com a fragmentação da observabilidade. Serviços distintos geram logs não estruturados com carimbos de data/hora inconsistentes, perdem a correlação de ponta a ponta através de chamadas HTTP e perdem o contexto de diagnóstico durante o ciclo de eventos assíncronos. Além disso, verificações frequentes de saúde disparadas por orquestradores de contêineres inundam os registros com respostas 200 OK repetitivas, ocultando sinais legítimos de erro.
 
 ```mermaid
 graph LR
-    Client["Client Applications<br/>(Client Session Header)"] -->|Ingress Request| Gateway["Reverse Proxy Gateway<br/>(Injects Trace Correlation ID)"]
-    Gateway --> ServiceA["Core API Service"]
-    Gateway --> ServiceB["Transit Routing Service"]
-    Gateway --> ServiceC["Billing / Operations Service"]
+    Client["Aplicações Clientes<br/>(Cabeçalho de Sessão do Cliente)"] -->|Requisição de Entrada| Gateway["Gateway de Proxy Reverso<br/>(Injeta ID de Correlação de Rastreio)"]
+    Gateway --> ServiceA["Serviço Principal de API"]
+    Gateway --> ServiceB["Serviço de Rotas de Transporte"]
+    Gateway --> ServiceC["Serviço de Operações e Faturamento"]
     
-    subgraph ObservabilityCore ["Distributed Observability Module"]
-        Context["Async Execution Context Storage"]
-        Logger["Structured High-Throughput JSON Logger"]
-        Filter["Intelligent Probe Filter"]
+    subgraph ObservabilityCore ["Módulo Central de Observabilidade"]
+        Context["Armazenamento de Contexto Assíncrono"]
+        Logger["Logger JSON Estruturado de Alta Vazão"]
+        Filter["Filtro Inteligente de Sondagens"]
     end
     
     ServiceA -.-> Context
     ServiceB -.-> Context
     ServiceC -.-> Context
     Context --> Logger
-    Filter -->|Mutes Redundant 200 Probes| Logger
-    Filter -->|Captures 5xx Failures with Stack| Logger
+    Filter -->|Silencia Sondagens 200 Redundantes| Logger
+    Filter -->|Captura Falhas 5xx com Stack| Logger
 ```
 
-## 3. My Contributions
-- **Created the Core Observability Engine:** Designed the library from scratch, packaging it for distribution across internal repositories with clean TypeScript definitions and zero extraneous runtime dependencies.
-- **Implemented Distributed Correlation Propagation:** Authored Express middlewares and Axios HTTP interceptors that automatically capture, generate, and forward trace correlation headers and client session identifiers across microservice hops.
-- **Engineered Noise-Suppression Health Logging:** Programmed a custom request logging middleware that mutes noisy 200 OK responses from container orchestrator `/health` and `/metrics` pollers, while ensuring any degraded or failed health check is immediately logged at ERROR level with complete diagnostic payloads.
-- **Built Background Task Context Tracking:** Developed execution wrappers (`background helpers`) that preserve trace contexts across asynchronous task queues, timers, and background workers.
+## 3. Minhas Contribuições
+- **Criação do Núcleo de Observabilidade:** Projetei a biblioteca do zero, estruturando o pacote para distribuição entre repositórios internos com definições tipadas em TypeScript e sem dependências de execução desnecessárias.
+- **Implementação da Propagação de Correlação Distribuída:** Desenvolvi middlewares para Express e interceptores para Axios que capturam, geram e repassam automaticamente cabeçalhos de correlação (`X-Correlation-Id`, `X-Installation-Id`) entre chamadas de microsserviços.
+- **Filtragem Inteligente de Logs de Verificação de Saúde:** Programei um middleware customizado que silencia respostas 200 OK originadas de sondagens de `/health` e `/metrics`, enquanto garante que qualquer degradação ou falha seja registrada imediatamente em nível ERROR com diagnóstico completo.
+- **Rastreamento de Contexto em Tarefas de Segundo Plano:** Desenvolvi funções utilitárias que preservam o contexto de rastreio em filas de tarefas assíncronas, temporizadores e rotinas em segundo plano.
 
-## 4. Technical Architecture
-The library uses Node.js asynchronous execution tracking and structured streaming with Pino:
+## 4. Arquitetura Técnica
+A biblioteca utiliza o controle de execução assíncrona nativo do Node.js (`AsyncLocalStorage`) e transmissão estruturada com Pino:
 
 ```mermaid
 sequenceDiagram
-    participant Client as Mobile / Web Client
-    participant Gateway as Reverse Proxy
-    participant Service as Express Microservice
-    participant ObsLib as Observability Library
-    participant Downstream as Downstream Internal Service
+    participant Client as Cliente Mobile / Web
+    participant Gateway as Proxy Reverso
+    participant Service as Microsserviço Express
+    participant ObsLib as Biblioteca de Observabilidade
+    participant Downstream as Serviço Interno Downstream
 
     Client->>Gateway: GET /resource (Header: Client-Installation-Id)
-    Gateway->>Service: Forward request (Injected: X-Correlation-Id)
+    Gateway->>Service: Repassa requisição (Injetado: X-Correlation-Id)
     Service->>ObsLib: requestLoggerMiddleware()
-    ObsLib->>ObsLib: Bind {correlationId, installationId} to Async Context
+    ObsLib->>ObsLib: Vincula {correlationId, installationId} ao Contexto Assíncrono
     Service->>Downstream: Axios GET /internal/data
-    ObsLib->>Downstream: Auto-injected headers (X-Correlation-Id)
-    Downstream-->>Service: Response 200 OK
-    Service-->>Client: Final Response
-    ObsLib->>Service: Emit structured JSON log entry with trace metadata
+    ObsLib->>Downstream: Cabeçalhos autoinjetados (X-Correlation-Id)
+    Downstream-->>Service: Resposta 200 OK
+    Service-->>Client: Resposta Final
+    ObsLib->>Service: Emite registro JSON estruturado com metadados de rastreio
 ```
 
-## 5. Technology Stack
-- **Language & Runtime:** TypeScript (strict typing), Node.js.
-- **Logging & Serialization:** Pino (high-throughput JSON structured logger).
-- **HTTP Instrumentation:** Axios interceptors, Express middleware, Node.js AsyncLocalStorage.
-- **Integration:** Git-based package distribution.
+## 5. Stack Tecnológica
+- **Linguagem e Ambiente:** TypeScript (tipagem estrita), Node.js.
+- **Registro e Serialização:** Pino (logger estruturado JSON de alta vazão).
+- **Instrumentação HTTP:** Interceptores Axios, middlewares Express, Node.js AsyncLocalStorage.
+- **Integração:** Distribuição de pacotes baseada em repositórios Git.
 
-## 6. Engineering Challenges
-### 1. Context Bleed and Lost Trace IDs in Asynchronous Callbacks
-*Problem:* In asynchronous event loops involving timers, background database updates, and external API calls, correlation IDs were frequently lost or mingled between concurrent sessions.
-*Solution:* Leveraged Node.js execution context storage (`AsyncLocalStorage`) to maintain an immutable correlation context boundary per request lifecycle, ensuring every nested log entry inherits the original correlation identifier without manual parameter passing.
+## 6. Desafios de Engenharia
+### 1. Perda de Contexto de Rastreio em Retornos Assíncronos
+*Problema:* Em fluxos assíncronos envolvendo temporizadores, atualizações no banco de dados e chamadas a APIs externas, identificadores de correlação se perdiam ou se misturavam entre sessões simultâneas.
+*Solução:* Utilizei o armazenamento de contexto de execução (`AsyncLocalStorage`) do Node.js para isolar o ciclo de vida de cada requisição, garantindo que qualquer registro de log herde o ID original sem necessidade de repassar parâmetros manualmente.
 
-### 2. Log Ingestion Overload from Frequent Health Probes
-*Problem:* Automated container health check probes hit microservice endpoints every few seconds, generating thousands of useless log lines per hour that consumed storage quota and obscured genuine runtime errors.
-*Solution:* Implemented conditional middleware filtering that inspects both the route path and the resulting status code. Successful 200 probes are silently passed through, but non-200 responses immediately trigger an error log with detailed system diagnostic info.
+### 2. Sobrecarga de Armazenamento por Sondagens de Saúde Excessivas
+*Problema:* Verificações automáticas do orquestrador consultavam os endpoints a cada poucos segundos, gerando milhares de linhas inúteis por hora que consumiam cota de armazenamento e obscureciam falhas reais.
+*Solução:* Implementei filtragem condicional no middleware avaliando tanto a rota quanto o código de status resultante. Sondagens 200 com sucesso passam em silêncio, mas respostas com erro ativam imediatamente registros detalhados com informações do sistema.
 
-## 7. Engineering Practices
-- **Strict Semantic Versioning:** Managed orderly version increments accompanied by markdown documentation detailing integration patterns.
-- **Minimal Footprint:** Designed with zero bloat to avoid adding execution overhead to microservice latency budgets.
-- **Standardized Log Schemas:** Guaranteed that all output matches an exact JSON schema containing ISO-8601 timestamps, log level, service name, correlation ID, installation ID, HTTP method, path, and duration.
+## 7. Práticas de Engenharia
+- **Versionamento Semântico Rigoroso:** Gerenciamento ordenado de versões acompanhado de documentação em markdown explicando padrões de integração.
+- **Pegada Leve de Execução:** Projeto sem código desnecessário para não impactar o orçamento de latência dos microsserviços.
+- **Esquema Padronizado de Logs:** Garantia de que cada saída siga um formato JSON exato com data/hora em ISO-8601, nível de severidade, nome do serviço, ID de correlação, rota e duração.
 
-## 8. Results and Impact
-- **19 verified commits** establishing the library, context interceptors, and releases up to version 1.4.0.
-- Standardized logging across 5 backend microservices and the administrative web portal.
-- Substantial reduction in log volume through intelligent health-check filtering, cutting noise while preserving 100% of failure diagnostics.
+## 8. Resultados e Impacto
+- **19 commits verificados** estabelecendo a biblioteca, interceptores de contexto e versões estáveis até a 1.4.0.
+- Padronização de logs em 5 microsserviços de backend e no portal web administrativo.
+- Redução expressiva no volume de logs desnecessários, mantendo 100% dos dados para diagnóstico de falhas.
 
-## 9. My Role
-Sole Author and Maintainer of the library, responsible for API design, context propagation logic, middleware implementations, documentation, and versioning.
+## 9. Meu Papel
+Autor e Mantenedor Único da biblioteca, responsável pelo design da API, lógica de propagação de contexto, middlewares, documentação técnica e controle de versões.

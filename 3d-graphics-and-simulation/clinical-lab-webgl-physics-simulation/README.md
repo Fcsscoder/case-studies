@@ -1,84 +1,84 @@
-# Case Study 02: First-Person 3D WebGL Clinical Laboratory & Physics Simulation
+# Estudo de Caso 02: Laboratório Clínico Virtual 3D em WebGL com Simulação Física em Primeira Pessoa
 
-## 1. Overview
-This case study documents the design and implementation of an interactive 3D WebGL virtual laboratory simulation created for first-person training in clinical immunohematology protocols. Running entirely in modern desktop WebGL2 browsers without external streaming infrastructure or server dependencies, the application simulates physical biological test tube handling, clinical equipment operation (centrifuges, incubators, analytical precision scales), and real-time visual inspection of diagnostic reaction patterns.
+## 1. Visão Geral
+Este estudo de caso documenta o projeto e desenvolvimento de uma simulação de laboratório virtual 3D interativa em WebGL, concebida para treinamento em primeira pessoa em protocolos de imuno-hematologia laboratorial. Executada inteiramente no navegador via WebGL2 sem necessidade de servidores de streaming ou infraestrutura remota, a aplicação simula a manipulação física de tubos de ensaio, a operação de instrumentos analíticos (centrífugas, incubadoras e balanças de precisão) e a análise visual em tempo real de reações de aglutinação.
 
-## 2. Context and Problem
-Hands-on laboratory training in pre-transfusion immunohematology involves significant reagent costs, specialized centrifuges and incubators, and strict biological safety protocols. Traditional digital e-learning solutions rely primarily on 2D point-and-click quizzes that fail to develop physical spatial memory, equipment handling discipline, and sequential protocol validation. The project solved this limitation by building a self-contained 3D simulation with deterministic rigid-body physics, tactile interaction, and accurate equipment finite-state machines.
+## 2. Contexto e Problema
+A capacitação prática em rotinas pré-transfusionais envolve custos recorrentes com reagentes biológicos, disponibilidade de equipamentos específicos e respeito a protocolos estritos de biossegurança. Softwares educacionais tradicionais costumam se limitar a questionários 2D de clicar e arrastar, formato que não estimula a percepção espacial, a familiaridade motora com o maquinário nem a validação de sequências procedimentais. O projeto contornou essa barreira construindo uma simulação tridimensional com física determinística de corpos rígidos, interação tátil e máquinas de estado para cada equipamento.
 
 ```mermaid
 graph TD
-    User["User Input (Keyboard / Mouse)"]
-    Controller["First-Person Character Controller"]
-    Physics["Rapier 3D Physics Engine (Wasm)"]
-    Inspect["1:1 Quaternion Inspection Camera"]
-    Equip["Equipment State Machines (Centrifuges, Incubator, Scale)"]
-    Renderer["Three.js / React Three Fiber Canvas"]
+    User["Entrada do Usuário (Teclado / Mouse)"]
+    Controller["Controlador de Movimento em Primeira Pessoa"]
+    Physics["Motor de Física Rapier 3D (Wasm)"]
+    Inspect["Câmera de Inspeção 1:1 com Quatérnions"]
+    Equip["Máquinas de Estado (Centrífugas, Incubadora, Balança)"]
+    Renderer["Cena Three.js / React Three Fiber"]
 
     User --> Controller
-    Controller -->|Kinematic Movement| Physics
-    User -->|Inspect Key 'I'| Inspect
-    User -->|Interact Key 'E' / 'F'| Equip
-    Inspect -->|Bokeh Blur & Orthogonal Zoom| Renderer
-    Physics -->|Rigid Body Transforms| Renderer
-    Equip -->|Digital Displays & Audio| Renderer
+    Controller -->|Movimento Cinemático| Physics
+    User -->|Tecla de Inspeção 'I'| Inspect
+    User -->|Tecla de Interação 'E' / 'F'| Equip
+    Inspect -->|Desfoque Bokeh e Zoom Ortogonal| Renderer
+    Physics -->|Transformações de Corpos Rígidos| Renderer
+    Equip -->|Displays Digitais e Feedback Sonoro| Renderer
 ```
 
-## 3. My Contributions
-- **Built the 1:1 Quaternion Inspection System:** Formulated screen-space aligned quaternion rotation for biological sample tubes and diagnostic cards, eliminating gimbal lock and rotational drift while applying real-time depth-of-field bokeh blur for reading minute agglutination patterns.
-- **Implemented Dynamic Rigid Body Collision Mechanics:** Integrated Rapier 3D physics to govern tube placement, rack extraction, physical socket snapping, and floor collision while preventing collision tunneling when items are held in the user's hand.
-- **Modeled Finite-State Machines for Clinical Equipment:** Programmed stateful digital displays, positional audio, and mechanical interlocks for specialized laboratory equipment:
-  - *Dedicated Diagnostic Centrifuge & Incubator:* Programmable spin cycles, countdown timers, and lid locking mechanisms.
-  - *Analytical Precision Scale:* Weight stabilization algorithms and tare mechanics.
-  - *Storage Refrigerator:* Articulated door physics with positional audio feedback.
-- **Automated E2E Performance Testing Suite:** Developed a Playwright test harness running headless Chromium in CI to measure frame rates and render time over continuous two-minute navigation routes.
+## 3. Minhas Contribuições
+- **Desenvolvimento do Sistema de Inspeção 1:1 com Quatérnions:** Formulei rotações com quatérnions alinhadas à orientação da câmera para tubos de amostra e cartões de gel, eliminando o travamento de cardan (gimbal lock) e derivas de rotação, além de aplicar desfoque de profundidade de campo bokeh para leitura detalhada de aglutinações.
+- **Mecânica de Colisão de Corpos Rígidos:** Integrei o motor de física Rapier 3D para coordenar o encaixe de tubos em estantes, retirada de frascos, posicionamento em suportes e colisões com o cenário, evitando travamentos ou transposição indevida de superfícies quando os itens estão nas mãos do usuário.
+- **Modelagem de Máquinas de Estado para Equipamentos Clínicos:** Programei mostradores digitais interativos, efeitos sonoros posicionais e travas mecânicas para o maquinário laboratorial:
+  - *Centrífuga e Incubadora de Diagnóstico:* Ciclos de rotação temporizados, contagem regressiva e travamento da tampa durante o funcionamento.
+  - *Balança Analítica de Precisão:* Algoritmos de estabilização de peso e função de tara.
+  - *Refrigerador de Conservação:* Física articulada na porta com retorno sonoro de abertura e fechamento.
+- **Bateria de Testes Automatizados de Desempenho:** Estruturei rotinas no Playwright executando Chromium em modo headless na esteira de integração contínua para monitorar taxa de quadros e estabilidade de renderização durante percursos de teste contínuos de dois minutos.
 
-## 4. Technical Architecture
-The application runs as a modular Three.js / React Three Fiber scene, isolating deterministic physics calculations from visual rendering:
+## 4. Arquitetura Técnica
+A aplicação opera como uma cena modular em Three.js e React Three Fiber, separando cálculos físicos determinísticos da renderização visual:
 
 ```mermaid
 sequenceDiagram
-    participant Player as Player Camera
-    participant Interaction as Interaction System
+    participant Player as Câmera do Jogador
+    participant Interaction as Módulo de Interação
     participant Physics as Rapier 3D (Wasm)
-    participant Scene as Three.js Scene
+    participant Scene as Cena Three.js
 
-    Player->>Interaction: Raycast target tube (Press 'E')
-    Interaction->>Physics: Kinematic detachment from rack socket
-    Physics-->>Interaction: Rigid body disabled / parented to camera offset
-    Player->>Interaction: Trigger Inspection mode (Press 'I')
-    Interaction->>Scene: Apply camera bokeh depth-of-field filter
-    Interaction->>Player: Lock screen-space mouse delta to quaternion rotation
-    Player->>Interaction: Release Inspection (Press 'Esc' or 'I')
-    Interaction->>Scene: Restore standard depth and FOV
-    Player->>Interaction: Drop tube (Press 'E')
-    Interaction->>Physics: Reactivate dynamic rigid body with forward velocity
+    Player->>Interaction: Mira no tubo de ensaio (Pressiona 'E')
+    Interaction->>Physics: Desconecta fisicamente da estante
+    Physics-->>Interaction: Desativa corpo rígido e ancora à câmera
+    Player->>Interaction: Ativa modo de Inspeção (Pressiona 'I')
+    Interaction->>Scene: Aplica filtro bokeh de profundidade de campo
+    Interaction->>Player: Vincula deslocamento do mouse à rotação por quatérnions
+    Player->>Interaction: Encerra inspeção (Pressiona 'Esc' ou 'I')
+    Interaction->>Scene: Restaura visão e profundidade padrão
+    Player->>Interaction: Solta o tubo (Pressiona 'E')
+    Interaction->>Physics: Reativa corpo rígido com velocidade para frente
 ```
 
-## 5. Technology Stack
-- **Core 3D Engine:** Three.js, React Three Fiber (R3F), `@react-three/drei`.
-- **Physics Engine:** `@react-three/rapier` (Rapier 3D compiled to WebAssembly).
-- **Language & Runtime:** TypeScript (strict mode), Node.js, Vite.
-- **Testing & QA:** Playwright (Chromium E2E headless & headed regression suite), Vitest.
+## 5. Stack Tecnológica
+- **Motor 3D Principal:** Three.js, React Three Fiber (R3F), `@react-three/drei`.
+- **Motor de Física:** `@react-three/rapier` (Rapier 3D compilado para WebAssembly).
+- **Linguagem e Ambiente:** TypeScript (modo estrito), Node.js, Vite.
+- **Testes e Qualidade:** Playwright (testes automatizados de regressão em Chromium), Vitest.
 
-## 6. Engineering Challenges
-### 1. Rotational Drift and Gimbal Lock During Tube Inspection
-*Problem:* In standard Euler angle implementations, rotating a 3D tube relative to the camera to read labels created severe gimbal lock and unnatural orientation flips when looking up or down.
-*Solution:* Switched rotation logic entirely to quaternions mapped directly to screen-space coordinates. Mouse movements on the X and Y axes apply incremental rotations around the camera's local up and right vectors, resulting in drift-free, intuitive 1:1 tactile examination.
+## 6. Desafios de Engenharia
+### 1. Travamento de Cardan e Desvios na Inspeção de Amostras
+*Problema:* Rotações baseadas em ângulos de Euler faziam o frasco girar de maneira brusca ou inverter a orientação ao olhar para cima ou para baixo, impossibilitando a leitura correta das etiquetas.
+*Solução:* Adotei quaternions calculados com base nas coordenadas da tela. O movimento do cursor do mouse nos eixos X e Y aplica variações incrementais sobre os vetores locais da câmera, garantindo rotação tátil, intuitiva e sem desvios angulares.
 
-### 2. Player Collider Collisions with Held Objects
-*Problem:* When a student picked up a test tube, the physics engine registered a collision between the player's character capsule collider and the held object's rigid body, launching the player across the room.
-*Solution:* Dynamically transitioned picked-up items into kinematic sensor mode, stripping internal colliders while held and restoring dynamic rigid-body properties only upon intentional drop or socket placement.
+### 2. Conflito de Colisão entre o Personagem e os Itens Segurados
+*Problema:* Ao pegar um frasco, o motor de física registrava colisão entre a cápsula de colisão do próprio jogador e o corpo rígido do tubo, arremessando o usuário pela sala.
+*Solução:* Configurei os itens recolhidos para alternar temporariamente para modo de sensor cinemático, desativando colisões internas enquanto estiverem nas mãos do usuário e reativando as propriedades dinâmicas apenas no momento da soltura ou encaixe.
 
-## 7. Engineering Practices
-- **Zero Remote Runtime Dependencies:** The build artifact is completely self-contained, loading all 3D assets, fonts, and WebAssembly binaries locally without requiring external CDNs.
-- **Reproducible 3D Asset Conversion Pipeline:** Built an asset ingestion script that extracts raw FBX models, normalizes metric scale dimensions to real-world laboratory proportions (e.g., 34 cm clipboard), and preserves original UV channels.
-- **Automated Performance Profiling:** Maintained an automated 120-second Playwright route monitoring FPS baselines to guard against memory leaks and CPU thread contention.
+## 7. Práticas de Engenharia
+- **Zero Dependências Remotas na Execução:** O pacote gerado é completamente autônomo, carregando todos os modelos 3D, fontes e binários WebAssembly localmente sem consultar CDNs externos.
+- **Esteira de Conversão de Recursos 3D:** Criação de scripts para extrair arquivos FBX brutos, calibrar proporções métricas para medidas reais de laboratório (como prancheta com 34 cm) e manter os canais de textura originais.
+- **Avaliação Contínua de Desempenho:** Teste automatizado de 120 segundos no Playwright monitorando os quadros por segundo para prevenir vazamentos de memória e sobrecarga da CPU.
 
-## 8. Results and Impact
-- **21 verified commits** delivering the complete 3D laboratory environment, physics interaction, and clinical equipment.
-- Flawless 60 FPS rendering in standard desktop browsers via WebGL2 and WebAssembly physics.
-- High-fidelity pre-transfusion workflow implementation (tube labeling, blood bag inspection, gel card agglutination interpretation).
+## 8. Resultados e Impacto
+- **21 commits verificados** cobrindo todo o ambiente do laboratório 3D, física interativa e equipamentos de bancada.
+- Renderização fluida a 60 FPS em navegadores comuns por meio de WebGL2 e WebAssembly.
+- Simulação detalhada dos passos pré-transfusionais (etiquetagem de tubos, checagem de bolsas de sangue e leitura de aglutinação em cartões de gel).
 
-## 9. My Role
-Sole Software Engineer and 3D Systems Architect. Responsible for the entire codebase: physics integration, interaction math, equipment state machines, asset conversion scripts, and automated E2E tests.
+## 9. Meu Papel
+Engenheiro de Software e Arquiteto de Sistemas 3D Único. Responsável por todo o código: física, matemática de interação, máquinas de estado de maquinário, scripts de conversão de arquivos e testes automatizados de ponta a ponta.

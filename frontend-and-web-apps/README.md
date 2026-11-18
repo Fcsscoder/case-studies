@@ -1,22 +1,22 @@
-# Frontend & Web Applications Case Studies
+# Estudos de Caso em Frontend e Aplicações Web
 
-This category showcases web application architectures built with React, Next.js, and TypeScript, focusing on client-to-server error observability, multi-tenant role-based administration, strict layered architectures, and mobile-first analytics.
+Esta categoria apresenta arquiteturas web desenvolvidas com React, Next.js e TypeScript, com foco em observabilidade de erros do cliente para o servidor, administração multi-tenant com controle de acesso, arquiteturas estritamente em camadas e métricas financeiras adaptadas para mobile.
 
 ---
 
-## Case Studies in this Track
+## Estudos de Caso nesta Trilha
 
-### 1. [Multi-Tenant Enterprise Operations Portal with Client-to-Server Error Tracing](enterprise-operations-admin-portal/README.md)
-* **Core Themes:** Next.js, Client Observability, Department Scoped RBAC, Layout Shift Optimization.
-* **Key Challenges:** Connecting client React error boundaries directly to structured server logs with incoming reverse-proxy correlation IDs, and eliminating layout shift (CLS) using custom-fitted skeleton screens.
-* **Technologies:** Next.js (App Router), React, TypeScript, Tailwind CSS, Playwright, Pino.
+### 1. [Portal Corporativo Multi-Tenant com Rastreamento de Erros Cliente-Servidor](enterprise-operations-admin-portal/README.md)
+* **Temas Centrais:** Next.js, Observabilidade de Cliente, RBAC Departamental, Otimização de Layout Shift.
+* **Principais Desafios:** Conectar barreiras de erro do React diretamente aos logs estruturados do servidor preservando o ID de correlação do proxy reverso, e eliminar saltos de interface (CLS) com telas de carregamento sob medida.
+* **Tecnologias:** Next.js (App Router), React, TypeScript, Tailwind CSS, Playwright, Pino.
 
-### 2. [Strict Layered Architecture Inventory Management & Revenue Platform](retail-inventory-analytics-platform/README.md)
-* **Core Themes:** Clean Layered Architecture, Decoupled Domain Services, Dual-Mode Database Connectivity.
-* **Key Challenges:** Enforcing strict separation across four tiers (UI → Route Handlers → Services → Prisma) and establishing a runtime database factory supporting local SQLite and edge libSQL without code changes.
-* **Technologies:** Next.js 15 (App Router), React 19, TypeScript, Prisma ORM, SQLite / Turso libSQL.
+### 2. [Plataforma Comercial com Arquitetura em Camadas e Análise de Faturamento](retail-inventory-analytics-platform/README.md)
+* **Temas Centrais:** Arquitetura em Camadas, Serviços de Domínio Desacoplados, Conectividade Dupla com Banco de Dados.
+* **Principais Desafios:** Aplicar separação rigorosa em quatro níveis (UI → Route Handlers → Serviços de Domínio → Prisma) e criar uma fábrica de conexões que suporta SQLite local e Turso em nuvem sem alterar código.
+* **Tecnologias:** Next.js 15 (App Router), React 19, TypeScript, Prisma ORM, SQLite / Turso libSQL.
 
-### 3. [Full-Stack Community Welfare & Adoption Management System](community-welfare-adoption-platform/README.md)
-* **Core Themes:** Full-Stack Architecture, Configurable Multi-Origin CORS, Containerized Cloud Deployments.
-* **Key Challenges:** Handling dynamic CORS origins across preview and production environments and managing persistent media volumes with Nginx caching on Linux VPS hosts.
-* **Technologies:** React, Node.js, Express, MongoDB, Mongoose, Docker, Nginx, GitHub Actions.
+### 3. [Sistema Full-Stack para Gestão de Adoções e Bem-Estar Comunitário](community-welfare-adoption-platform/README.md)
+* **Temas Centrais:** Arquitetura Full-Stack, CORS Dinâmico para Múltiplas Origens, Publicação em Nuvem com Contêineres.
+* **Principais Desafios:** Lidar com origens dinâmicas de CORS entre ambientes locais e de produção, além de gerenciar volumes persistentes de fotos com cache no Nginx em servidores Linux.
+* **Tecnologias:** React, Node.js, Express, MongoDB, Mongoose, Docker, Nginx, GitHub Actions.

@@ -1,82 +1,82 @@
-# Case Study 14: Zero-Asset Procedural 2D Isometric Healthcare Training Simulation
+# Estudo de Caso 14: Simulação Educacional Isométrica 2D sem Dependência de Imagens Externas
 
-## 1. Overview
-This case study documents the design and development of an educational 2D simulation game featuring an isometric perspective, built to train primary healthcare community agents. Running entirely on client-side web technologies (React and Vanilla HTML5 Canvas 2D), the simulation generates 100% of its visual assets, character sprites, and environments procedurally in code without external image files, paired with background music synthesized in real time via the Web Audio API.
+## 1. Visão Geral
+Este estudo de caso documenta o projeto e desenvolvimento de um jogo educacional 2D com perspectiva isométrica, criado para treinamento de agentes comunitários de saúde na Atenção Primária. Executada unicamente com tecnologias nativas do navegador (React e HTML5 Canvas 2D), a simulação desenha 100% de seus elementos visuais, personagens e cenários de forma procedural via código, acompanhada por trilha sonora sintetizada em tempo real pela Web Audio API.
 
-## 2. Context and Problem
-Healthcare educational web tools frequently suffer from heavy network footprints caused by large image sprite sheets, audio soundbanks, and 3D textures, making them inaccessible over poor mobile internet connections in remote rural areas. Furthermore, standard multiple-choice quiz formats fail to engage community health agents in reading spatial and environmental health cues (e.g., stagnant water containers, vector breeding zones, vulnerable household distributions).
+## 2. Contexto e Problema
+Aplicações educacionais para a área da saúde frequentemente exigem conexões de alta velocidade devido ao tamanho de pacotes de imagens, amostras gravadas de áudio e texturas, inviabilizando o acesso em áreas periféricas ou rurais com sinal restrito de internet móvel. Além disso, questionários teóricos de múltipla escolha não desenvolvem a habilidade dos agentes de identificar riscos sanitários no território (como focos de água parada, descarte irregular de resíduos e distribuição das residências).
 
 ```mermaid
 graph TD
-    User["Community Healthcare Student"]
-    UI["React Application Shell"]
-    Canvas["HTML5 Canvas 2D Engine<br/>(100% Procedural Isometric Vector Render)"]
-    AudioEngine["Web Audio API Sound Synthesizer<br/>(Zero-Sample Procedural Audio)"]
-    MissionEngine["Community Outreach Mission State Machine"]
+    User["Estudante de Saúde Comunitária"]
+    UI["Estrutura da Aplicação React"]
+    Canvas["Motor HTML5 Canvas 2D<br/>(Renderização Isométrica 100% Procedural)"]
+    AudioEngine["Sintetizador Web Audio API<br/>(Áudio Procedural sem Arquivos Externos)"]
+    MissionEngine["Máquina de Estados de Visita Comunitária"]
 
     User --> UI
     UI --> Canvas
     UI --> AudioEngine
     UI --> MissionEngine
-    MissionEngine -->|Territory & Household States| Canvas
-    MissionEngine -->|Acoustic Cues| AudioEngine
+    MissionEngine -->|Estados do Território e Casas| Canvas
+    MissionEngine -->|Gatilhos Sonoros| AudioEngine
 ```
 
-## 3. My Contributions
-- **Created the Core Project Architecture:** Initialized the project foundation and established the modular component structure separating game state, dialogues, minigames, and rendering loops.
-- **Engineered Interactive Territory Exploration Mechanics:** Replaced legacy multiple-choice questions (`Troca intro-03 de múltipla escolha por leitura do território`) with an interactive territory reading mechanic requiring players to spatially navigate microareas, examine residential plots, and identify environmental vectors.
-- **Integrated Procedural Isometric Canvas Rendering:** Structured the Canvas 2D isometric projection pipeline, transforming 2D grid coordinates into screen-space isometric diamonds with dynamic depth sorting.
-- **Implemented Web Audio Synthesis Pipelines:** Integrated procedural audio oscillators and gain nodes to generate ambient acoustic feedback and musical motifs without loading recorded MP3 or WAV assets.
+## 3. Minhas Contribuições
+- **Estruturação da Base do Projeto:** Inicializei o projeto estabelecendo a arquitetura modular que separa o estado da partida, as árvores de diálogo, as tarefas de inspeção e os loops de desenho na tela.
+- **Desenvolvimento da Leitura Interativa do Território:** Substituí questões teóricas estáticas de múltipla escolha (`Troca intro-03 de múltipla escolha por leitura do território`) por uma mecânica interativa onde o aluno navega pelas microáreas, inspeciona os quintais e localiza potenciais criadouros de vetores.
+- **Renderização Isométrica com Canvas 2D:** Modelei a projeção matemática isométrica no Canvas, convertendo coordenadas de grade plana em losangos no espaço da tela com ordenação dinâmica de sobreposição (depth sorting).
+- **Geração de Áudio com Síntese em Tempo Real:** Conectei nós de osciladores e controle de ganho na Web Audio API para tocar melodias e efeitos sonoros sem carregar arquivos MP3 ou WAV.
 
-## 4. Technical Architecture
-The application runs as a lightweight, self-contained client-side rendering loop:
+## 4. Arquitetura Técnica
+A aplicação funciona como um ciclo autônomo de renderização no próprio navegador do usuário:
 
 ```mermaid
 sequenceDiagram
-    participant User as Student
-    participant Engine as React Game Loop
-    participant Territory as Territory Simulation
-    participant Canvas as Canvas 2D Renderer
-    participant Audio as Web Audio Synth
+    participant User as Aluno
+    participant Engine as Loop de Jogo React
+    participant Territory as Simulação do Território
+    participant Canvas as Renderizador Canvas 2D
+    participant Audio as Sintetizador Web Audio
 
-    User->>Engine: Begin Outreach Mission
-    Engine->>Audio: Initialize AudioContext (Oscillator Nodes)
-    Audio-->>User: Emit synthesized ambient soundscape
-    loop Every Frame (60 FPS)
-        Engine->>Territory: Compute agent position & household state
-        Engine->>Canvas: Clear canvas & transform grid to isometric space
-        Canvas->>Canvas: Draw procedural geometric terrain, houses, and vectors
-        Canvas-->>User: Rendered frame
+    User->>Engine: Inicia Visita Comunitária
+    Engine->>Audio: Inicializa AudioContext (Nós de Oscilador)
+    Audio-->>User: Emite música ambiente sintetizada
+    loop A Cada Quadro (60 FPS)
+        Engine->>Territory: Atualiza posição do agente e estado das casas
+        Engine->>Canvas: Limpa tela e aplica transformação isométrica
+        Canvas->>Canvas: Desenha terreno, construções e vetores procedurais
+        Canvas-->>User: Exibe quadro na tela
     end
-    User->>Engine: Identify environmental hazard (Stagnant water)
-    Engine->>Audio: Trigger harmonic success tone (Synthesized Sine Wave)
-    Engine->>Territory: Mark vector eliminated & update score
+    User->>Engine: Localiza foco de água parada
+    Engine->>Audio: Dispara acorde harmônico de sucesso (Onda Senoidal)
+    Engine->>Territory: Marca foco como eliminado e soma pontuação
 ```
 
-## 5. Technology Stack
-- **Framework & Language:** JavaScript, React, Vite.
-- **Graphics Engine:** HTML5 Canvas 2D API (Procedural isometric projection).
-- **Audio Engine:** Web Audio API (Synthesized oscillators and envelope generators).
-- **Build & Quality:** Vite, ESLint.
+## 5. Stack Tecnológica
+- **Framework e Linguagem:** JavaScript, React, Vite.
+- **Motor Gráfico:** API HTML5 Canvas 2D (projeção isométrica calculada matematicamente).
+- **Motor de Áudio:** Web Audio API (síntese via osciladores e geradores de envelope).
+- **Construção e Qualidade:** Vite, ESLint.
 
-## 6. Engineering Challenges
-### 1. Achieving Zero-Asset Visual Quality
-*Problem:* Downloading sprite packs over low-bandwidth cellular networks in remote health clinics caused long load times and high bounce rates.
-*Solution:* Formulated geometric vector algorithms to draw all buildings, roofs, fences, and character sprites directly using Canvas path commands (`beginPath`, `lineTo`, `arc`, `fill`). By relying on pure math and color gradients, the total asset transfer size was reduced to zero bytes.
+## 6. Desafios de Engenharia
+### 1. Eliminação Total do Download de Imagens e Sons
+*Problema:* Baixar conjuntos de imagens e sons em conexões móveis lentas em postos de saúde gerava longos períodos de espera e abandono do treinamento.
+*Solução:* Programei algoritmos geométricos para desenhar casas, telhados, cercas e personagens utilizando apenas traçados nativos do Canvas (`beginPath`, `lineTo`, `arc`, `fill`). Com o uso exclusivo de fórmulas matemáticas e gradientes de cores, o tamanho de transferência de arquivos de mídia caiu para zero bytes.
 
-### 2. Real-Time Dynamic Isometric Depth Sorting
-*Problem:* In isometric projections, characters and environmental objects must be rendered in strict back-to-front order; otherwise, characters incorrectly clip through building walls or walk underneath ground tiles.
-*Solution:* Implemented an active depth-sorting buffer that orders all drawable entities by their composite isometric depth coordinates `(x + y)` before executing each frame's draw pass, eliminating visual z-fighting.
+### 2. Ordenação Dinâmica de Profundidade em Perspectiva Isométrica
+*Problema:* Em projeções isométricas, os elementos precisam ser desenhados na ordem exata do fundo para a frente; caso contrário, os personagens atravessam paredes ou caminham por baixo do chão.
+*Solução:* Implementei uma ordenação periódica de profundidade que organiza todas as entidades a serem desenhadas pela soma de suas coordenadas isométricas `(x + y)` antes de renderizar cada quadro, eliminando falhas visuais de sobreposição.
 
-## 7. Engineering Practices
-- **Extreme Portability:** The application builds into a minuscule, static `dist/` bundle that can run completely offline from local storage or low-cost static web servers.
-- **Accessible Learning Mechanics:** Designed spatial interaction patterns that teach real-world sanitary barrier identification through direct exploration rather than passive text memorization.
-- **Standardized Component Hierarchy:** Structured modular subcomponents (`DengueHuntMission`, `TerritoryObserveGame`, `BloodGlucoseRender`) to allow rapid extension of new clinical triage modules.
+## 7. Práticas de Engenharia
+- **Portabilidade Máxima:** A compilação gera um diretório estático minúsculo (`dist/`) capaz de rodar sem conexão em armazenamentos locais ou em servidores web simples.
+- **Aprendizado Prático por Exploração:** Planejamento de interações que ensinam a identificar barreiras sanitárias através da exploração ativa do cenário, em vez de memorização mecânica de texto.
+- **Componentização Extensível:** Separação de módulos específicos (`DengueHuntMission`, `TerritoryObserveGame`, `BloodGlucoseRender`) facilitando a inclusão de novas atividades de triagem clínica.
 
-## 8. Results and Impact
-- **2 verified commits** laying the architectural foundation and implementing the spatial territory exploration mechanics.
-- A fully functional, zero-external-asset educational healthcare simulation that loads instantaneously on any mobile or desktop browser.
-- Interactive vector identification training without requiring heavy graphic asset downloads.
+## 8. Resultados e Impacto
+- **2 commits verificados** estabelecendo a base da arquitetura e desenvolvendo a navegação e leitura do território.
+- Aplicação funcional de simulação em saúde sem arquivos externos de mídia, com abertura instantânea em qualquer celular ou computador.
+- Capacitação imersiva de agentes comunitários sem custos de transferência de dados gráficos.
 
-## 9. My Role
-Founding Developer and Simulation Architect. Established the project foundation, designed the isometric territory exploration mechanics, and structured the procedural Canvas game loop.
+## 9. Meu Papel
+Desenvolvedor Fundador e Arquiteto de Simulação. Estruturei a fundação do código, concebi a exploração territorial interativa e organizei o ciclo de renderização no Canvas.

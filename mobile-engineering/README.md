@@ -1,15 +1,15 @@
-# Mobile Engineering Case Studies
+# Estudos de Caso em Engenharia Mobile
 
-This category highlights mobile application development with React Native and Expo, focusing on cross-platform performance, battery-efficient real-time transit timelines, accessible animation design, regulatory privacy compliance, and Android native alarm integrations.
+Esta categoria destaca o desenvolvimento de aplicações móveis com React Native e Expo, priorizando desempenho multiplataforma, eficiência energética no rastreamento de frotas, acessibilidade em animações, conformidade regulatória de privacidade e integração nativa com o sistema Android.
 
 ---
 
-## Case Studies in this Track
+## Estudos de Caso nesta Trilha
 
-### 1. [Real-Time Fleet Transit Navigation & Privacy-Preserving Mobile Application](campus-mobility-transit-app/README.md)
-* **Core Themes:** React Native, Expo, Geolocation & Transit, Accessibility, Regulatory Privacy Gates.
-* **Key Challenges:**
-  - Designing a single-stroke animated bus timeline with an accessible pulsating origin that dynamically collapses under OS-level `prefers-reduced-motion` settings.
-  - Enforcing a strict technical privacy gate that prevents any network telemetry or background queries from executing prior to explicit user terms acceptance.
-  - Scheduling exact departure reminder notifications using Android's native `SCHEDULE_EXACT_ALARM` permissions.
-* **Technologies:** React Native, Expo, TypeScript, NativeWind (Tailwind CSS), Android Native Bridge, Jest.
+### 1. [Aplicativo Mobile de Rastreamento de Frotas com Preservação de Privacidade](campus-mobility-transit-app/README.md)
+* **Temas Centrais:** React Native, Expo, Geolocalização e Transporte, Acessibilidade, Barreiras Regulatórias de Privacidade.
+* **Principais Desafios:**
+  - Criação de linha do tempo de paradas em SVG animada com indicador pulsante que desativa dinamicamente sob a configuração de redução de movimento do sistema operacional (`prefers-reduced-motion`).
+  - Aplicação de barreira técnica de consentimento que bloqueia qualquer tráfego de rede ou telemetria em segundo plano antes da aceitação formal dos termos.
+  - Agendamento de notificações de partidas com horário exato utilizando permissões nativas `SCHEDULE_EXACT_ALARM` no Android.
+* **Tecnologias:** React Native, Expo, TypeScript, NativeWind (Tailwind CSS), Bridge Nativa Android, Jest.

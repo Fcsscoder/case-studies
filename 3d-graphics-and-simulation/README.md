@@ -1,22 +1,22 @@
-# 3D Graphics, WebGL & Simulation Case Studies
+# Estudos de Caso em Computação Gráfica 3D, WebGL e Simulação
 
-This category groups computer graphics and simulation engineering case studies, covering real-time WebGL2 rendering, deterministic WebAssembly rigid-body physics, screen-space quaternion camera mathematics, and zero-asset procedural vector graphics.
+Esta categoria reúne estudos de engenharia gráfica e simulações interativas, abordando renderização em WebGL2 em tempo real, física de corpos rígidos determinística com WebAssembly, matemática de rotação com quatérnions sem travamento de cardan e renderização procedural puramente vetorial.
 
 ---
 
-## Case Studies in this Track
+## Estudos de Caso nesta Trilha
 
-### 1. [First-Person 3D WebGL Clinical Laboratory & Physics Simulation](clinical-lab-webgl-physics-simulation/README.md)
-* **Core Themes:** WebGL2, Three.js, React Three Fiber, Rapier 3D (Wasm), Quaternion Mathematics.
-* **Key Challenges:** Formulating screen-space aligned quaternion rotations for tactile 3D object examination without gimbal lock or drift, paired with real-time bokeh depth-of-field effects and clinical equipment finite-state machines.
-* **Technologies:** Three.js, React Three Fiber, Rapier 3D (Wasm), TypeScript, Vite, Playwright E2E.
+### 1. [Laboratório Clínico Virtual 3D em WebGL com Simulação Física em Primeira Pessoa](clinical-lab-webgl-physics-simulation/README.md)
+* **Temas Centrais:** WebGL2, Three.js, React Three Fiber, Rapier 3D (Wasm), Matemática de Quatérnions.
+* **Principais Desafios:** Formular rotações com quatérnions alinhadas à câmera para manipulação tátil de frascos sem deriva angular, somado a efeitos de profundidade de campo bokeh e máquinas de estado para equipamentos clínicos.
+* **Tecnologias:** Three.js, React Three Fiber, Rapier 3D (Wasm), TypeScript, Vite, Playwright E2E.
 
-### 2. [Multi-User Real-Time Simulation Engine & Space Flight Telemetry](multiplayer-space-flight-simulation/README.md)
-* **Core Themes:** Cooperative Multiplayer, WebSockets, Real-Time Telemetry Calibration, 3D Scenes.
-* **Key Challenges:** Synchronizing multi-client state transitions and audio effects over Socket.IO while calibrating planetary radiation survival rules against real-world deep space radiation telemetry.
-* **Technologies:** React 19, TypeScript, Three.js, Socket.IO, Neon PostgreSQL, Drizzle ORM.
+### 2. [Motor de Simulação Espacial Cooperativa Multiusuário em Tempo Real](multiplayer-space-flight-simulation/README.md)
+* **Temas Centrais:** Modo Multijogador Cooperativo, WebSockets, Calibração de Telemetria, Cenas Tridimensionais.
+* **Principais Desafios:** Sincronizar transições de estado e efeitos sonoros entre clientes conectados via Socket.IO, calibrando mecânicas de sobrevivência com dados científicos reais de radiação espacial.
+* **Tecnologias:** React 19, TypeScript, Three.js, Socket.IO, Neon PostgreSQL, Drizzle ORM.
 
-### 3. [Zero-Asset Procedural 2D Isometric Healthcare Training Simulation](procedural-2d-isometric-health-sim/README.md)
-* **Core Themes:** Procedural Graphics, HTML5 Canvas 2D, Web Audio API, Zero-Asset Deployment.
-* **Key Challenges:** Eliminating all external image sprites and audio assets to ensure instantaneous loading over restricted mobile networks, using pure vector path math and real-time oscillator synthesis.
-* **Technologies:** JavaScript, React, HTML5 Canvas 2D, Web Audio API.
+### 3. [Simulação Educacional Isométrica 2D sem Dependência de Imagens Externas](procedural-2d-isometric-health-sim/README.md)
+* **Temas Centrais:** Gráficos Procedurais, HTML5 Canvas 2D, Web Audio API, Arquitetura sem Recursos Externos.
+* **Principais Desafios:** Eliminar o download de imagens e áudios para viabilizar carregamento instantâneo em conexões de baixa velocidade, utilizando geometria vetorial pura e osciladores sintetizados em tempo real.
+* **Tecnologias:** JavaScript, React, HTML5 Canvas 2D, Web Audio API.

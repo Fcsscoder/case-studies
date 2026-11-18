@@ -1,82 +1,82 @@
-# Case Study 05: Multi-Tenant Enterprise Operations Portal with Client-to-Server Error Tracing
+# Estudo de Caso 05: Portal Corporativo Multi-Tenant com Rastreamento de Erros Cliente-Servidor
 
-## 1. Overview
-This case study examines the development of an enterprise web operations portal built with Next.js and TypeScript, designed to coordinate multi-department administrative workflows. The portal manages real-time transit schedules, vehicle/fleet assignments, cafeteria menus, dynamic homepage banners, and official institutional announcements under strict department-level access control.
+## 1. Visão Geral
+Este estudo de caso analisa o desenvolvimento de um portal web corporativo construído com Next.js e TypeScript, projetado para coordenar fluxos administrativos de múltiplos setores. A plataforma gerencia horários de transporte em tempo real, escalas de frotas e motoristas, cardápios de restaurantes universitários, banners dinâmicos e comunicados oficiais sob controle de acesso baseado em departamentos.
 
-## 2. Context and Problem
-Managing distributed organization-wide services involves multiple autonomous operational departments (e.g., transit dispatchers, communications staff, catering managers). Early operations suffered from cross-department permission bleed, where staff from one department could inadvertently modify or unpublish another department's notices. Additionally, unhandled frontend exceptions in operator browsers produced no server-side telemetry, making production UI debugging impossible without direct operator interviews.
+## 2. Contexto e Problema
+A coordenação de serviços organizacionais descentralizados envolve diversos departamentos independentes (como operadores de transporte, assessoria de comunicação e fiscais de alimentação). A gestão anterior sofria com sobreposição de acessos, onde servidores de um setor podiam inadvertidamente alterar dados de outro departamento. Além disso, falhas não tratadas nos navegadores dos operadores não geravam telemetria no servidor, impedindo a reprodução de erros de produção sem contato direto com o usuário.
 
 ```mermaid
 graph TD
-    Admin["Department Administrator"]
-    UI["Next.js Operations Portal (React / TS)"]
-    ErrorBoundary["Client Error Boundary"]
-    ServerLogger["Structured Server Logger"]
-    RBAC["Department-Scoped Authorization Gate"]
-    API["Microservices Gateway (Reverse Proxy)"]
+    Admin["Administrador do Setor"]
+    UI["Portal de Operações Next.js (React / TS)"]
+    ErrorBoundary["Barreira de Erro no Cliente"]
+    ServerLogger["Logger Estruturado do Servidor"]
+    RBAC["Validador de Escopo Departamental"]
+    API["Gateway de Microsserviços (Proxy Reverso)"]
 
     Admin --> UI
-    UI -->|Uncaught React Exception| ErrorBoundary
-    ErrorBoundary -->|Pushes Crash Stack + Trace ID| ServerLogger
-    UI -->|Actions (News, Banners, Fleet)| RBAC
-    RBAC -->|Enforces Department Scope| API
-    API -->|Propagates Trace Correlation ID| ServerLogger
+    UI -->|Erro React Não Tratado| ErrorBoundary
+    ErrorBoundary -->|Envia Stack de Erro + ID de Rastreio| ServerLogger
+    UI -->|Ações (Notícias, Banners, Frota)| RBAC
+    RBAC -->|Garante Escopo Departamental| API
+    API -->|Propaga ID de Correlação de Rastreio| ServerLogger
 ```
 
-## 3. My Contributions
-- **Built End-to-End Client-to-Server Distributed Error Tracing:** Integrated React client error boundaries with the server-side structured logger, capturing unhandled UI exceptions, component stack traces, and propagating correlation headers received from the reverse proxy directly into server logs (`onRequestError`).
-- **Implemented Department-Scoped Access Control:** Engineered validation guards restricting content publication and transit alert authoring to authorized departmental units (`owner.department`), preventing cross-department data overwrites.
-- **Developed Drag-and-Drop Banner Sequencing:** Created an interactive drag-and-drop UI component allowing administrators to visually re-sequence portal announcement banners with immediate preview and atomic database updates.
-- **Engineered Tailored Skeleton Loading Architecture:** Replaced generic spinners with bespoke skeleton screens precisely mirroring the layout geometry across 6 core views (Roles, Admins, News, Fleet, Dining, and Notices), eliminating cumulative layout shifts (CLS).
-- **Automated Expired Session Purging:** Authored scheduled backend maintenance scripts to purge expired refresh tokens, keeping session tables lean and secure.
-- **Automated CI/CD with Self-Signed Certificate Handling:** Configured GitHub Actions pipelines that build OCI images, push to GHCR, and trigger automated redeploy webhooks on internal deployment orchestrators supporting self-signed TLS certificates.
+## 3. Minhas Contribuições
+- **Rastreamento de Erros de Ponta a Ponta do Cliente ao Servidor:** Conectei barreiras de erro do React ao logger estruturado do servidor via `onRequestError`, capturando falhas não tratadas na interface com pilhas de execução de componentes e IDs de correlação do proxy reverso.
+- **Controle de Acesso Delimitado por Departamento:** Implementei travas de autorização que limitam o gerenciamento de comunicados e alertas à unidade departamental de origem do usuário (`owner.department`), bloqueando edições indevidas entre setores.
+- **Reordenação Visual de Banners com Drag-and-Drop:** Desenvolvi um componente interativo de arrastar e soltar que permite organizar a sequência de avisos com pré-visualização instantânea e atualizações atômicas no banco.
+- **Arquitetura de Carregamento sem Layout Shift (CLS):** Substituí indicadores genéricos de carregamento por telas esqueleto (skeletons) planejadas com as dimensões exatas de 6 telas operacionais (Cargos, Administradores, Notícias, Frotas, Refeitórios e Avisos), eliminando deslocamentos bruscos de conteúdo.
+- **Limpeza Automática de Sessões Vencidas:** Criei rotinas agendadas no backend para expurgar tokens de atualização expirados, preservando a performance das tabelas de sessão.
+- **Esteira de CI/CD para Ambientes com Certificados Customizados:** Estruturei pipelines no GitHub Actions para gerar imagens OCI, publicar no GHCR e acionar webhooks em orquestradores de contêineres compatíveis com certificados TLS internos.
 
-## 4. Technical Architecture
-The system architecture bridges client-side React rendering with server-side tracing and token governance:
+## 4. Arquitetura Técnica
+A arquitetura integra a renderização do React às rotinas de telemetria e governança de tokens do servidor:
 
 ```mermaid
 sequenceDiagram
-    participant User as Administrative Operator
-    participant Boundary as Client Error Boundary
-    participant NextAPI as Next.js Server Route Handler
-    participant Logger as Structured Logger (Pino)
-    participant Gateway as Reverse Proxy
+    participant User as Operador Administrativo
+    participant Boundary as Barreira de Erro do Cliente
+    participant NextAPI as Rota de Servidor Next.js
+    participant Logger as Logger Estruturado (Pino)
+    participant Gateway as Proxy Reverso
 
-    User->>User: Interaction triggers unexpected client error
-    User->>Boundary: Error caught by componentDidCatch
-    Boundary->>NextAPI: POST /api/telemetry/client-error (with stack & URL)
-    NextAPI->>Gateway: Inherit incoming trace correlation ID
-    NextAPI->>Logger: Emit structured ERROR with trace ID & client stack
-    Logger-->>NextAPI: Ingested
-    NextAPI-->>Boundary: 200 OK (error tracked)
-    Boundary-->>User: Present recovery UI with reference code
+    User->>User: Ação na interface dispara erro inesperado
+    User->>Boundary: Erro interceptado por componentDidCatch
+    Boundary->>NextAPI: POST /api/telemetry/client-error (com stack e URL)
+    NextAPI->>Gateway: Herda ID de correlação de rastreio de entrada
+    NextAPI->>Logger: Emite registro ERROR estruturado com ID e pilha do cliente
+    Logger-->>NextAPI: Gravado
+    NextAPI-->>Boundary: 200 OK (erro registrado)
+    Boundary-->>User: Exibe interface amigável com código de referência
 ```
 
-## 5. Technology Stack
-- **Framework:** Next.js (App Router / Pages), React, TypeScript.
-- **Styling & Components:** Tailwind CSS, custom design system, drag-and-drop primitives.
-- **Observability:** Pino, Next.js instrumentation (`onRequestError`), correlation tracing.
-- **Testing & Tooling:** Playwright E2E testing, ESLint, Prettier.
-- **Deployment:** Docker, GitHub Actions, GHCR, container redeployment webhooks.
+## 5. Stack Tecnológica
+- **Framework Web:** Next.js (App Router / Pages), React, TypeScript.
+- **Estilização e Componentes:** Tailwind CSS, design system próprio, primitivas de drag-and-drop.
+- **Observabilidade:** Pino, instrumentação Next.js (`onRequestError`), rastreamento de correlação.
+- **Testes e Qualidade:** Testes E2E com Playwright, ESLint, Prettier.
+- **Infraestrutura e Deploy:** Docker, GitHub Actions, GHCR, webhooks de reinicialização.
 
-## 6. Engineering Challenges
-### 1. Inability to Debug Client-Side Crashes in Production
-*Problem:* Operators encountered occasional rendering failures in specific browser environments, but since the errors occurred client-side, backend server logs showed no trace of the failure.
-*Solution:* Wired the top-level React Error Boundary to a dedicated telemetry endpoint. The endpoint captures the error stack, component tree hierarchy, and browser user agent, tags it with the active session's correlation ID, and logs it directly into the server's structured logging pipeline.
+## 6. Desafios de Engenharia
+### 1. Ausência de Visibilidade de Erros de Interface em Produção
+*Problema:* Operadores enfrentavam falhas pontuais de renderização em determinados navegadores, mas como os erros ocorriam no cliente, os servidores não registravam nenhum alerta.
+*Solução:* Integrei a barreira de erros do React a um endpoint dedicado de telemetria. O serviço recebe a pilha da falha, a árvore de componentes e os dados do navegador, etiqueta com o ID de correlação da sessão e grava no fluxo estruturado de logs do servidor.
 
-### 2. Layout Shift and Race Conditions in Table Skeletons
-*Problem:* Initial generic loading indicators caused jarring page layout shifts when transitioning from loading to populated state, occasionally triggering race conditions in Playwright E2E test runs.
-*Solution:* Engineered dedicated skeleton components matching the exact height, padding, and column counts of each view, and coordinated state transitions to eliminate UI jumping and resolve Playwright test runner races.
+### 2. Deslocamento de Layout (CLS) em Tabelas com Dados Dinâmicos
+*Problema:* Carregamentos iniciais causavam saltos abruptos nos elementos da tela ao carregar dados tabulares, gerando inclusive condições de corrida nos testes automatizados com Playwright.
+*Solução:* Projetei componentes esqueleto específicos espelhando as alturas e colunas de cada visualização, eliminando variações de layout e estabilizando a execução da suite de testes.
 
-## 7. Engineering Practices
-- **Strict Role-Based Integrity:** Every mutation operation validates departmental ownership at the API boundary, guaranteeing that one administrative unit cannot delete or edit another department's notices.
-- **Automated E2E Test Coverage:** Built Playwright E2E suites covering complex administrative interactions including transit alert creation, driver scheduling, and multi-select batch actions.
-- **Staging and Production Isolation:** Maintained rigorous configuration segregation between staging and production environments, documenting environment contracts across the team.
+## 7. Práticas de Engenharia
+- **Validação de Permissão na Borda da API:** Cada operação de alteração de dados verifica o vínculo departamental na chegada da requisição, garantindo isolamento entre unidades administrativas.
+- **Cobertura com Testes E2E:** Criação de rotinas com Playwright cobrindo interações complexas como agendamento de avisos de transporte, alocação de veículos e ações em lote.
+- **Separação Estrita de Ambientes:** Isolamento rigoroso entre as configurações de teste e produção, com documentação clara dos contratos de ambiente compartilhada com a equipe.
 
-## 8. Results and Impact
-- **147 verified commits** establishing the operations portal, observability hooks, layout systems, and deployment workflows.
-- Successful management of daily transit announcements and organizational news across multiple administrative units.
-- Elimination of blind spots in production frontend monitoring through automated error boundary reporting.
+## 8. Resultados e Impacto
+- **147 commits verificados** estabelecendo o portal corporativo, ganchos de observabilidade, interfaces acessíveis e esteiras de entrega contínua.
+- Gestão diária de comunicados institucionais e alertas de mobilidade entre múltiplos setores operacionais.
+- Eliminação de pontos cegos na identificação de bugs de frontend por meio do envio automático de relatórios de erro.
 
-## 9. My Role
-Lead Frontend and Operations Architect for the portal. Responsible for the UI architecture, client-side observability integration, department-level authorization logic, and CI/CD pipelines.
+## 9. Meu Papel
+Arquiteto Frontend e de Operações do portal. Liderei a modelagem de interface, integração da observabilidade do cliente, lógica de acesso departamental e automação de CI/CD.

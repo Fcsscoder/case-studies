@@ -1,88 +1,88 @@
-# Case Study 04: Real-Time Fleet Transit Navigation & Privacy-Preserving Mobile Application
+# Estudo de Caso 04: Aplicativo Mobile de Rastreamento de Frotas com Preservação de Privacidade
 
-## 1. Overview
-This case study covers the frontend and mobile architecture of a production cross-platform application developed with React Native and Expo for thousands of daily active users. The application serves as an institutional mobility and services super-app, consolidating real-time shuttle fleet tracking, route stop timelines, cafeteria meal schedules, news feeds, and personalized schedule alerts.
+## 1. Visão Geral
+Este estudo de caso abrange a arquitetura frontend e mobile de uma aplicação multiplataforma em produção desenvolvida com React Native e Expo para milhares de usuários ativos diários. O aplicativo funciona como uma plataforma integrada de mobilidade e serviços institucionais, reunindo rastreamento de frotas de transporte em tempo real, linhas do tempo de paradas, cardápios de restaurantes universitários, feeds de notícias e lembretes de horários personalizados.
 
-## 2. Context and Problem
-The host organization operates a geographically distributed multi-campus network across several municipalities, relying on scheduled shuttle fleets to transport members and staff. Users frequently experienced scheduling friction, missed connections, and unannounced traffic reroutes due to a lack of live digital tracking. Furthermore, strict statutory privacy requirements demanded that user telemetry, identifier exchange, and background network queries remain completely halted until explicit informed consent is recorded.
+## 2. Contexto e Problema
+A instituição opera uma rede geograficamente distribuída de múltiplos campi em diferentes municípios, dependendo de frotas de ônibus circulares para o transporte de alunos e servidores. Usuários enfrentavam constantes desencontros de horários, perda de viagens e alterações imprevistas de rotas devido à ausência de rastreamento digital. Além disso, exigências regulatórias rigorosas de privacidade exigiam que qualquer coleta de telemetria, troca de identificadores e consultas de rede em segundo plano ficassem totalmente bloqueadas até que o consentimento formal do usuário fosse registrado.
 
 ```mermaid
 graph TD
-    User["Mobile User"]
-    Consent["Regulatory Consent Boundary Guard"]
-    Router["Expo Router Navigation"]
-    Transit["Transit Timeline Component<br/>(Pulsing Origin & Exact Alarms)"]
-    Dining["Dining Hall & Menu Cache<br/>(ISO Week Calendar Handling)"]
-    Offline["Self-Healing Local Storage Cache"]
-    Gateway["Enterprise Reverse Proxy Gateway"]
+    User["Usuário Mobile"]
+    Consent["Barreira Regulatória de Consentimento"]
+    Router["Navegação com Expo Router"]
+    Transit["Componente de Linha do Tempo<br/>(Origem Pulsante e Alarmes Exatos)"]
+    Dining["Cache de Cardápios e Refeições<br/>(Semana Calendário ISO)"]
+    Offline["Cache Local com Autorrecuperação"]
+    Gateway["Gateway Corporativo de Proxy Reverso"]
 
     User --> Consent
-    Consent -->|Consent Granted| Router
-    Consent -->|Consent Pending| TermsScreen["Mandatory Terms of Privacy"]
+    Consent -->|Consentimento Aceito| Router
+    Consent -->|Pendente| TermsScreen["Termos de Privacidade Obrigatórios"]
     Router --> Transit
     Router --> Dining
     Transit <--> Offline
     Dining <--> Offline
-    Offline <-->|Validated Schema Sync| Gateway
+    Offline <-->|Sincronização com Esquema Validado| Gateway
 ```
 
-## 3. My Contributions
-- **Engineered an Accessible Bus Stop Timeline UI:** Designed and developed a custom single-stroke SVG/Canvas transit timeline featuring an animated pulsating origin stop indicator, engineered with reactive support for system-level reduced motion preferences (`prefers-reduced-motion`).
-- **Implemented an Android Exact Alarm Permission Module:** Developed native bridge integration to inspect and request exact alarm scheduling permissions on modern Android versions, ensuring transit reminder notifications fire with exact wall-clock timing.
-- **Architected a Strict Consent Barrier:** Built a routing middleware that intercepts application boot, blocking any background data processing, telemetry logging, or API token exchange until the user explicitly accepts privacy terms.
-- **Developed a Self-Healing Offline Cache:** Created resilient storage logic on top of AsyncStorage that validates incoming API payloads, self-heals corrupted cache structures, and handles ISO week boundaries for meal menus.
-- **Streamlined CI/CD & Over-The-Air (OTA) Updates:** Configured automated linting, type-checking, and Jest testing pipelines on push and PR, along with Expo EAS over-the-air update capabilities.
+## 3. Minhas Contribuições
+- **Desenvolvimento da Linha do Tempo de Transporte Acessível:** Projetei e programei uma linha do tempo vetorial em SVG com indicador pulsante animado na parada de origem, implementando suporte dinâmico para a preferência de redução de movimento do sistema operacional (`prefers-reduced-motion`).
+- **Módulo Nativo de Alarmes Exatos no Android:** Desenvolvi a integração com o módulo nativo do Android para consultar e requisitar permissões de agendamento de alarmes exatos, assegurando que as notificações de lembrete de partida disparem precisamente no horário programado.
+- **Estruturação de Barreira Rigorosa de Consentimento:** Criei um middleware de roteamento que intercepta o carregamento da aplicação, bloqueando chamadas de API, telemetria e tokens até a aceitação explícita dos termos de privacidade.
+- **Cache Local com Autorrecuperação:** Desenvolvi uma camada de persistência resiliente sobre o AsyncStorage que valida dados recebidos da rede contra esquemas estritos, repara estruturas corrompidas e manipula chaves baseadas em semanas ISO para os cardápios.
+- **Otimização de CI/CD e Atualizações OTA:** Configurei rotinas de validação estática de tipos, linting e testes automatizados com Jest em pull requests, além de suporte a atualizações sem necessidade de nova instalação via Expo EAS.
 
-## 4. Technical Architecture
-The client architecture enforces a clean separation between UI components, custom hooks, and offline storage:
+## 4. Arquitetura Técnica
+A arquitetura do cliente separa rigorosamente componentes visuais, hooks customizados e persistência local:
 
 ```mermaid
 sequenceDiagram
-    participant User as User
-    participant App as Mobile App Boot
-    participant Gate as Consent Guard
-    participant Alarm as Exact Alarm Module
-    participant API as Transit Backend
+    participant User as Usuário
+    participant App as Inicialização do App
+    participant Gate as Barreira de Consentimento
+    participant Alarm as Módulo de Alarmes Exatos
+    participant API as Backend de Transporte
 
-    App->>Gate: Check consent token in secure storage
-    alt Consent Not Yet Accepted
-        Gate-->>User: Present Mandatory Terms of Privacy
-        Note over Gate: No API calls or telemetry emitted
-        User->>Gate: Accept Terms
-        Gate->>Gate: Persist consent timestamp
+    App->>Gate: Verifica token de consentimento no armazenamento seguro
+    alt Consentimento Ainda Não Registrado
+        Gate-->>User: Exibe Termos de Privacidade Obrigatórios
+        Note over Gate: Nenhuma chamada de API ou telemetria é emitida
+        User->>Gate: Aceita os Termos
+        Gate->>Gate: Salva carimbo de data e hora do consentimento
     end
-    Gate->>App: Unlock main tab navigation
-    User->>App: Select transit route & enable notification
-    App->>Alarm: Verify SCHEDULE_EXACT_ALARM permission
-    Alarm-->>App: Permission confirmed
-    App->>API: Fetch timetable & cache with ISO week key
+    Gate->>App: Libera navegação principal por abas
+    User->>App: Seleciona linha de transporte e ativa lembrete
+    App->>Alarm: Valida permissão SCHEDULE_EXACT_ALARM
+    Alarm-->>App: Permissão confirmada
+    App->>API: Busca horários e grava em cache com chave de semana ISO
 ```
 
-## 5. Technology Stack
-- **Framework:** React Native, Expo, Expo Router.
-- **Styling & Design System:** Tailwind CSS via NativeWind, custom SVG icons.
-- **State & Storage:** React Hooks, AsyncStorage, custom self-healing cache wrappers.
-- **Native Modules:** Android Exact Alarm native bridge integration.
-- **Testing & Quality:** Jest, React Native Testing Library, ESLint, Prettier.
+## 5. Stack Tecnológica
+- **Framework Mobile:** React Native, Expo, Expo Router.
+- **Estilização e Design System:** Tailwind CSS via NativeWind, ícones vetoriais em SVG.
+- **Estado e Armazenamento:** React Hooks, AsyncStorage, camada de cache com autorrecuperação.
+- **Módulos Nativos:** Integração nativa para Alarmes Exatos no Android.
+- **Testes e Qualidade:** Jest, React Native Testing Library, ESLint, Prettier.
 
-## 6. Engineering Challenges
-### 1. Battery Drain and Animation Jank on Transit Timelines
-*Problem:* Continuous looping pulse animations on transit origin stops caused excessive battery consumption and visual jank on lower-end Android hardware, and caused discomfort for users with vestibular sensitivities.
-*Solution:* Implemented an interaction-aware animation hook that pauses rendering when the transit tab is out of focus, hooks into `InteractionManager` during transitions, and immediately collapses into a static high-contrast marker when the OS `reduce motion` setting is active.
+## 6. Desafios de Engenharia
+### 1. Consumo Excessivo de Bateria e Travamentos em Animações
+*Problema:* Animações de pulso contínuo na linha do tempo geravam consumo desnecessário de bateria e quedas de quadros em dispositivos Android básicos, além de desconforto visual para usuários sensíveis a movimentos contínuos.
+*Solução:* Implementei um hook de animação consciente do contexto que pausa o desenho quando a aba perde o foco, sincroniza com o `InteractionManager` durante transições de tela e substitui a animação por um marcador estático de alto contraste caso a redução de movimento esteja ativada no sistema.
 
-### 2. Silent Notification Failures on Android 12+
-*Problem:* Battery-saving restrictions in Android 12 and above delayed or canceled transit reminder notifications when scheduled via standard notification APIs.
-*Solution:* Integrated explicit checks for the `SCHEDULE_EXACT_ALARM` permission, directing users to system authorization screens when necessary and gracefully falling back to inexact interval notifications if declined.
+### 2. Notificações Silenciadas pelo Modo de Economia do Android 12+
+*Problema:* Otimizações de bateria em versões recentes do Android atrasavam ou cancelavam lembretes de transporte agendados via APIs comuns de notificação.
+*Solução:* Adicionei validação explícita da permissão `SCHEDULE_EXACT_ALARM`, conduzindo o usuário à tela de autorização do sistema quando necessário e utilizando intervalos aproximados caso a permissão seja recusada.
 
-## 7. Engineering Practices
-- **Privacy by Design:** Strict technical enforcement ensuring that unauthenticated or unconsented app states never ping backend telemetry endpoints.
-- **Resilient Mobile Caching:** Payloads fetched from the network are validated against runtime schemas before persisting, preventing corrupt API responses from bricking local state.
-- **Comprehensive Mobile Testing:** Maintained unit and integration tests covering debounce utilities, schedule calculations, and notification trigger handlers.
+## 7. Práticas de Engenharia
+- **Privacidade por Concepção:** Garantia técnica de que estados não autenticados ou sem consentimento nunca façam requisições para endpoints de telemetria.
+- **Persistência Móvel Segura:** Dados vindos da rede são validados contra esquemas em tempo de execução antes de serem gravados no disco local, prevenindo travamentos do aplicativo por respostas corrompidas.
+- **Bateria Abrangente de Testes:** Manutenção de testes unitários e de integração cobrindo debounce, cálculos de horários e disparos de alarmes.
 
-## 8. Results and Impact
-- **133 verified commits** driving the transit interface, privacy consent boundary, native alarm permissions, and release stabilization.
-- Delivered a stable daily mobile tool utilized across a distributed institutional network.
-- 100% compliance with privacy regulatory standards and zero battery-drain complaints related to transit UI animations.
+## 8. Resultados e Impacto
+- **133 commits verificados** consolidando o módulo de transporte, barreira de privacidade, alarmes nativos e estabilização de versões.
+- Ferramenta diária utilizada por milhares de membros da comunidade acadêmica em múltiplos campi.
+- Conformidade total com normas de privacidade e zero relatos de consumo anômalo de bateria vinculados à interface.
 
-## 9. My Role
-Core Mobile Engineer and Frontend Architect. Collaborated with peer mobile developers, owning the transit feature architecture, exact alarm native integration, security gates, and release testing pipelines.
+## 9. Meu Papel
+Engenheiro Mobile Principal e Arquiteto Frontend. Atuei em colaboração com outros desenvolvedores mobile, responsabilizando-me pela arquitetura do módulo de transporte, integração dos alarmes nativos, barreiras de segurança e pipelines de testes.

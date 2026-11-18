@@ -1,86 +1,86 @@
-# Case Study 09: Concurrency-Safe Editorial Workflow Engine with Formal State Machines
+# Estudo de Caso 09: Motor de Fluxo Editorial Concorrente com Máquinas de Estado Formais
 
-## 1. Overview
-This case study documents the design and development of an event-driven editorial microservice governing article lifecycles — from initial drafting and co-author collaboration to regional tutor review, formal revision, and public release. Engineered with Node.js and PostgreSQL, the service implements a formal finite-state machine (FSM) backed by transactional concurrency controls to coordinate multi-stakeholder publishing pipelines.
+## 1. Visão Geral
+Este estudo de caso documenta o projeto e desenvolvimento de um microsserviço editorial orientado a eventos responsável por governar o ciclo de vida de publicações técnicas: da redação inicial e colaboração entre autores até a revisão de tutores regionais, ajustes formais e publicação definitiva. Construído com Node.js e PostgreSQL, o serviço adota uma máquina de estados finitos (FSM) apoiada por controles de concorrência transacionais para coordenar fluxos com múltiplos participantes.
 
-## 2. Context and Problem
-Academic and research dissemination workflows require strict multi-stage editorial controls: contributors draft content, designated reviewers evaluate and request revisions, and editorial directors authorize publication. Without formal state validation and concurrency barriers, simultaneous edits by multiple co-authors or competing review decisions by multiple reviewers caused inconsistent states (e.g., articles marked as published without reviewer approval) and attribution anomalies.
+## 2. Contexto e Problema
+Fluxos de divulgação científica e relatórios institucionais exigem rigorosas etapas editoriais: autores escrevem o conteúdo, revisores designados avaliam e apontam ajustes, e coordenadores autorizam a publicação. Sem uma validação formal de estados e travas de concorrência, revisões simultâneas de múltiplos participantes ou envios concorrentes causavam inconsistências no banco de dados (como artigos publicados sem aprovação formal) e distorções de autoria.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> DRAFT: Author creates article
-    DRAFT --> IN_REVIEW: Author submits for review
-    IN_REVIEW --> REVISION_REQUESTED: Reviewer requests changes
-    REVISION_REQUESTED --> IN_REVIEW: Author resubmits revision
-    IN_REVIEW --> APPROVED: Assigned Reviewer approves
-    APPROVED --> PUBLISHED: Scheduled / Immediate release
-    DRAFT --> ARCHIVED: Author archives
-    IN_REVIEW --> REJECTED: Reviewer rejects with feedback
+    [*] --> DRAFT: Autor cria artigo
+    DRAFT --> IN_REVIEW: Autor submete para revisão
+    IN_REVIEW --> REVISION_REQUESTED: Revisor solicita alterações
+    REVISION_REQUESTED --> IN_REVIEW: Autor reenvia correções
+    IN_REVIEW --> APPROVED: Revisor designado aprova
+    APPROVED --> PUBLISHED: Publicação imediata ou agendada
+    DRAFT --> ARCHIVED: Autor arquiva
+    IN_REVIEW --> REJECTED: Revisor rejeita com parecer
     PUBLISHED --> [*]
 ```
 
-## 3. My Contributions
-- **Engineered the Editorial State Machine Engine:** Programmed a deterministic state machine that enforces valid transition paths, preventing out-of-order state mutations (e.g., jumping from `DRAFT` directly to `PUBLISHED`).
-- **Implemented Atomic Database Locking Under READ COMMITTED:** Structured all transition logic within PostgreSQL transactions with row-level locks (`SELECT FOR UPDATE`), eliminating race conditions during simultaneous tutor approvals or concurrent author updates.
-- **Conducted Mutation Testing on Policy Rules:** Subjected the editorial authorization engine and state machine transitions to mutation testing, ensuring boundary conditions and role gates were comprehensively verified.
-- **Architected Versioned Editorial Submissions:** Designed an immutable snapshot model where every review cycle records a distinct submission version, preserving historical revision feedback and diffs.
-- **Built Inter-Service Authorization Integration:** Implemented a decoupled authorization client that validates token claims and group memberships against the identity service without leaking internal credentials.
+## 3. Minhas Contribuições
+- **Desenvolvimento do Motor de Máquina de Estados:** Programei uma máquina de estados determinística que valida os caminhos de transição permitidos, bloqueando desvios fora da ordem definida (como transitar de `DRAFT` direto para `PUBLISHED`).
+- **Travamento Atômico em Banco sob READ COMMITTED:** Estruturei toda a lógica de transição dentro de transações PostgreSQL utilizando travas em nível de linha (`SELECT FOR UPDATE`), eliminando condições de corrida entre aprovações simultâneas de tutores ou envios de autores.
+- **Aplicação de Testes de Mutação nas Regras Editoriais:** Submeti o mecanismo de autorização e as transições da máquina de estados a testes de mutação para garantir a integridade dos limites de acesso de cada papel.
+- **Modelagem de Envios com Histórico Imutável:** Modelei um esquema de versões imutáveis onde cada ciclo de revisão registra uma versão isolada, preservando os pareceres e as diferenças de texto ao longo do tempo.
+- **Comunicação Desacoplada com o Serviço de Identidade:** Construí um cliente de autenticação que valida papéis e vínculos de grupos junto ao serviço de IAM sem expor credenciais internas.
 
-## 4. Technical Architecture
-The service isolates editorial state transitions inside transactional boundary guards:
+## 4. Arquitetura Técnica
+O serviço isola as transições de estado dentro de transações protegidas por travas no banco:
 
 ```mermaid
 sequenceDiagram
-    participant Author as Contributing Author
-    participant Reviewer as Assigned Reviewer
-    participant API as Editorial Service API
-    participant Engine as Finite-State Engine
+    participant Author as Autor
+    participant Reviewer as Revisor Designado
+    participant API as API do Serviço Editorial
+    participant Engine as Motor de Estados Finitos
     participant PG as PostgreSQL (READ COMMITTED)
 
     Author->>API: POST /articles/:id/submit
     API->>PG: BEGIN TRANSACTION
     API->>PG: SELECT * FROM articles WHERE id = :id FOR UPDATE
-    PG-->>API: Locked article record (State: DRAFT)
-    API->>Engine: validateTransition(DRAFT, IN_REVIEW, Actor: Author)
-    Engine-->>API: Valid transition approved
+    PG-->>API: Registro do artigo travado (Estado: DRAFT)
+    API->>Engine: validateTransition(DRAFT, IN_REVIEW, Ator: Autor)
+    Engine-->>API: Transição válida aprovada
     API->>PG: UPDATE articles SET state = 'IN_REVIEW', version = version + 1
     API->>PG: COMMIT
-    PG-->>API: Committed
-    API-->>Author: 200 OK (Submitted for Review)
+    PG-->>API: Confirmado
+    API-->>Author: 200 OK (Submetido para Revisão)
     
-    Reviewer->>API: POST /articles/:id/review (Action: REVISE)
-    API->>PG: BEGIN TRANSACTION & ROW LOCK
-    API->>Engine: validateTransition(IN_REVIEW, REVISION_REQUESTED, Actor: Reviewer)
-    Engine-->>API: Valid transition approved
+    Reviewer->>API: POST /articles/:id/review (Ação: REVISE)
+    API->>PG: BEGIN TRANSACTION e Trava de Linha
+    API->>Engine: validateTransition(IN_REVIEW, REVISION_REQUESTED, Ator: Revisor)
+    Engine-->>API: Transição válida aprovada
     API->>PG: UPDATE articles SET state = 'REVISION_REQUESTED'
     API->>PG: COMMIT
-    API-->>Reviewer: 200 OK (Revision requested)
+    API-->>Reviewer: 200 OK (Revisão Solicitada)
 ```
 
-## 5. Technology Stack
-- **Backend & API:** Node.js, Express.js, TypeScript.
-- **Data Persistence:** PostgreSQL (using atomic row locks and `READ COMMITTED` transaction isolation).
-- **Architecture Pattern:** Finite-State Machine (FSM), Command Query Responsibility Segregation (CQRS) light.
-- **Testing & Quality:** Jest, Mutation Testing, Vitest.
+## 5. Stack Tecnológica
+- **Backend e API:** Node.js, Express.js, TypeScript.
+- **Persistência de Dados:** PostgreSQL (travas de linha atômicas e isolamento de transação `READ COMMITTED`).
+- **Padrões de Arquitetura:** Máquina de Estados Finitos (FSM), segregação simplificada de leitura e escrita (CQRS light).
+- **Testes e Qualidade:** Jest, Testes de Mutação, Vitest.
 
-## 6. Engineering Challenges
-### 1. Concurrency Anomalies During Simultaneous Review Actions
-*Problem:* In regional working groups with multiple assigned reviewers, two reviewers simultaneously clicking "Approve" and "Request Changes" caused race conditions, leading to articles marked approved while simultaneously generating revision notifications.
-*Solution:* Wrapped state validation and mutation inside an isolated database transaction with row-level locking (`SELECT FOR UPDATE`). The first transaction updates the article version and state; the second transaction fails validation against the updated state and safely returns an HTTP 409 Conflict.
+## 6. Desafios de Engenharia
+### 1. Inconsistências de Concorrência Durante Ações Simultâneas de Revisão
+*Problema:* Em grupos com múltiplos revisores avaliando o mesmo artigo, decisões simultâneas de "Aprovar" e "Solicitar Ajustes" causavam condições de corrida, deixando o artigo aprovado enquanto gerava notificações de solicitação de mudanças.
+*Solução:* Englobei a validação e a mudança de estado em uma transação com trava de linha (`SELECT FOR UPDATE`). A primeira requisição atualiza o estado e a versão do artigo; a segunda transação falha na validação contra o novo estado e retorna de forma segura um erro HTTP 409 Conflict.
 
-### 2. Ensuring Strict Role-Gated Transition Permissions
-*Problem:* Reviewers should only approve articles authored within their assigned working group, while system administrators should oversee system-level releases without acting as co-authors on student papers.
-*Solution:* Engineered formal policy guards separating operational roles (Admin, Reviewer, Author) and integrated mutation tests to mathematically prove that no actor can trigger an unauthorized transition.
+### 2. Controle Estrito de Permissões por Papel e Grupo
+*Problema:* Revisores só podiam aprovar trabalhos de autores pertencentes ao seu próprio grupo de trabalho, enquanto administradores gerais gerenciavam o sistema sem atuar diretamente como coautores.
+*Solução:* Criei regras de validação separando expressamente os papéis (Admin, Revisor, Autor) e adicionei testes de mutação para demonstrar matematicamente que nenhum usuário consegue acionar transições não permitidas.
 
-## 7. Engineering Practices
-- **Immutable Submission Snapshots:** Each cycle of editorial review preserves an immutable snapshot of the text, preventing authors from modifying content while an active tutor review is underway.
-- **Mutation-Tested Integrity:** The entire state machine transition matrix is covered by automated mutation tests, guaranteeing regression resistance against subtle logical operators.
-- **Explicit Error Handlers:** Replaced silent failures with explicit domain errors mapped to semantic HTTP status codes (400, 403, 409, 422).
+## 7. Práticas de Engenharia
+- **Snapshots Imutáveis de Revisão:** Cada rodada de parecer salva uma cópia imutável do conteúdo, impedindo que o autor altere o texto enquanto uma revisão formal estiver em andamento.
+- **Validação com Testes de Mutação:** Toda a matriz de transição de estados é coberta por testes de mutação, assegurando proteção contra falhas causadas por operadores condicionais.
+- **Erros Semânticos Claros:** Substituição de falhas silenciosas por exceções de domínio mapeadas diretamente para códigos HTTP semânticos (400, 403, 409, 422).
 
-## 8. Results and Impact
-- **13 verified commits** delivering the complete editorial state machine, transactional locking, mutation test suites, and review pipelines.
-- 100% elimination of state corruption during parallel editorial reviews.
-- Seamless handling of article reviews across distributed regional health teams.
+## 8. Resultados e Impacto
+- **13 commits verificados** implementando a máquina de estados, travas transacionais, testes de mutação e pipelines de revisão.
+- Eliminação total de corrupção de estados em avaliações editoriais concorrentes.
+- Operação estável na gestão de relatórios técnicos entre equipes regionais descentralizadas.
 
-## 9. My Role
-Sole Backend Architect and Developer for the Editorial Service. Engineered the finite-state machine, transactional database locking, mutation testing, and inter-service authorization client.
+## 9. Meu Papel
+Arquiteto e Desenvolvedor Backend Único do Serviço Editorial. Projetei a máquina de estados finitos, as travas transacionais em banco de dados, os testes de mutação e o cliente de integração com o serviço de autenticação.

@@ -1,97 +1,97 @@
-# Engineering Case Studies Portfolio
+# Portfólio de Estudos de Caso de Engenharia
 
-A curated collection of production case studies detailing software architecture, systems engineering, and problem-solving across diverse engineering domains.
+Uma coleção selecionada de estudos de caso em produção detalhando arquitetura de software, engenharia de sistemas e resolução de problemas técnicos em múltiplos domínios de engenharia.
 
-Every case study is fully anonymized to maintain institutional and proprietary confidentiality, focusing exclusively on verifiable engineering achievements, architectural decisions, and concrete technical solutions.
+Todos os estudos de caso são devidamente anonimizados para preservar o sigilo institucional e corporativo, focando estritamente em realizações técnicas verificáveis, decisões de arquitetura e soluções de engenharia concretas.
 
 ---
 
-## Navigation by Engineering Track
+## Navegação por Trilha de Engenharia
 
 ```
 case-studies/
-├── backend-and-distributed-systems/   # Tracing, Microservices, Hexagonal IAM & State Machines
-├── mobile-engineering/                 # React Native, Expo, Accessible UI & Privacy Gates
-├── frontend-and-web-apps/              # Next.js 15, Multi-Tenant Portals & Layered Web Apps
-├── 3d-graphics-and-simulation/         # Three.js, Rapier 3D (Wasm), Quaternions & WebSockets
-├── data-engineering-and-privacy/       # PII Sanitization, Streaming CSV Ingestion & Indexing
-├── fullstack-and-monorepos/            # Monorepos (npm workspaces), DAG Graphs & Canvas Queues
-└── embedded-systems-and-iot/           # ESP32 C++, MQTT Brokers & SSE Real-Time Streaming
+├── backend-and-distributed-systems/   # Rastreamento Distribuído, Microsserviços, IAM Hexagonal e Máquinas de Estado
+├── mobile-engineering/                 # React Native, Expo, Interfaces Acessíveis e Barreiras de Privacidade
+├── frontend-and-web-apps/              # Next.js 15, Portais Corporativos Multi-Tenant e Aplicações em Camadas
+├── 3d-graphics-and-simulation/         # Three.js, Rapier 3D (Wasm), Quatérnions e WebSockets
+├── data-engineering-and-privacy/       # Sanitização de PII, Ingestão de CSV em Streaming e Indexação
+├── fullstack-and-monorepos/            # Monorepos (npm workspaces), Grafos DAG e Filas de Canvas
+└── embedded-systems-and-iot/           # ESP32 C++, Brokers MQTT e Transmissão em Tempo Real com SSE
 ```
 
 ---
 
-### 1. [Backend & Distributed Systems](backend-and-distributed-systems/README.md)
-* **[High-Throughput Node.js Distributed Tracing & Structured Logging Library](backend-and-distributed-systems/distributed-observability-lib/README.md)**  
+### 1. [Backend e Sistemas Distribuídos](backend-and-distributed-systems/README.md)
+* **[Biblioteca de Rastreamento Distribuído e Logs Estruturados para Node.js](backend-and-distributed-systems/distributed-observability-lib/README.md)**  
   *Stack:* TypeScript · Node.js · Pino · Axios · AsyncLocalStorage  
-  *Highlights:* Zero-dependency core library for propagating correlation contexts across microservices, selective health-check log filtering, and error telemetry.
+  *Destaques:* Biblioteca modular sem dependências externas para propagar contextos de correlação entre microsserviços, filtragem inteligente de logs de health check e telemetria de falhas.
 
-* **[Fault-Tolerant Unstructured Document Ingestion Pipeline & Hardened API Gateway](backend-and-distributed-systems/fault-tolerant-ingestion-gateway/README.md)**  
+* **[Pipeline Tolerante a Falhas para Ingestão de Documentos e Gateway Blindado](backend-and-distributed-systems/fault-tolerant-ingestion-gateway/README.md)**  
   *Stack:* Python 3 · PyPDF · Node.js · Express · Docker Compose · Nginx · MongoDB  
-  *Highlights:* Robust PDF tabular extraction with 31 regression test suites, automated supervisor orchestrating isolated worker daemons, and security-hardened API gateway.
+  *Destaques:* Extração de tabelas PDF com bateria de 31 testes de regressão, supervisor automático orquestrando daemons isolados e gateway com proteção ativa contra abusos.
 
-* **[Hexagonal Architecture Identity & Access Management Microservice](backend-and-distributed-systems/hexagonal-auth-service/README.md)**  
-  *Stack:* TypeScript · Node.js · Clean Architecture (Ports & Adapters) · PostgreSQL · JWT  
-  *Highlights:* Strict domain/infrastructure boundary separation, concurrent session rotation, token revocation guards, and mutation testing of group authorization policies.
+* **[Microsserviço de Gestão de Identidade e Acesso em Arquitetura Hexagonal](backend-and-distributed-systems/hexagonal-auth-service/README.md)**  
+  *Stack:* TypeScript · Node.js · Arquitetura Hexagonal (Ports & Adapters) · PostgreSQL · JWT  
+  *Destaques:* Separação estrita entre domínio e infraestrutura, rotação de sessão concorrente, salvaguardas de revogação de tokens e testes de mutação para políticas de autorização.
 
-* **[Concurrency-Safe Editorial Workflow Engine with Formal State Machines](backend-and-distributed-systems/concurrency-safe-editorial-engine/README.md)**  
+* **[Motor de Fluxo Editorial Concorrente com Máquinas de Estado Formais](backend-and-distributed-systems/concurrency-safe-editorial-engine/README.md)**  
   *Stack:* TypeScript · Node.js · Express · PostgreSQL (`READ COMMITTED`) · State Machine  
-  *Highlights:* Formal editorial state machine, mutation-tested transition guards, versioned article submissions, and optimistic concurrency locks.
+  *Destaques:* Máquina de estados formal para publicação, travas transacionais em nível de linha, artigos com versionamento imutável e testes de mutação.
 
 ---
 
-### 2. [Mobile Engineering](mobile-engineering/README.md)
-* **[Real-Time Fleet Transit Navigation & Privacy-Preserving Mobile Application](mobile-engineering/campus-mobility-transit-app/README.md)**  
+### 2. [Engenharia Mobile](mobile-engineering/README.md)
+* **[Aplicativo Mobile de Rastreamento de Frotas com Preservação de Privacidade](mobile-engineering/campus-mobility-transit-app/README.md)**  
   *Stack:* React Native · Expo · TypeScript · NativeWind · Android Exact Alarms · Jest  
-  *Highlights:* Single-stroke transit timeline with animated pulsating origin respecting user accessibility (`reduce motion`), strict regulatory privacy consent barrier, and exact alarm scheduling.
+  *Destaques:* Linha do tempo em traço único com origem pulsante adaptada a acessibilidade (redução de movimento), barreira técnica de consentimento de privacidade e alarmes exatos no Android.
 
 ---
 
-### 3. [Frontend & Web Applications](frontend-and-web-apps/README.md)
-* **[Multi-Tenant Enterprise Operations Portal with Client-to-Server Error Tracing](frontend-and-web-apps/enterprise-operations-admin-portal/README.md)**  
+### 3. [Frontend e Aplicações Web](frontend-and-web-apps/README.md)
+* **[Portal Corporativo Multi-Tenant com Rastreamento de Erros Cliente-Servidor](frontend-and-web-apps/enterprise-operations-admin-portal/README.md)**  
   *Stack:* Next.js · React · TypeScript · Tailwind CSS · Playwright · Pino  
-  *Highlights:* Department-scoped role authorization, drag-and-drop banner sequencing, client-side error boundaries piped directly into server structured logs, and automated container redeployment webhooks.
+  *Destaques:* Autorização por departamento, ordenação visual de avisos com drag-and-drop, barreiras de erro no cliente integradas aos logs estruturados do servidor e telas de carregamento planejadas contra layout shift.
 
-* **[Strict Layered Architecture Inventory Management & Revenue Platform](frontend-and-web-apps/retail-inventory-analytics-platform/README.md)**  
+* **[Plataforma Comercial com Arquitetura em Camadas e Análise de Faturamento](frontend-and-web-apps/retail-inventory-analytics-platform/README.md)**  
   *Stack:* Next.js 15 (App Router) · React 19 · TypeScript · Prisma ORM · SQLite / Turso libSQL  
-  *Highlights:* Strict four-tier layered architecture (UI → Route Handlers → Domain Services → Prisma), dual-mode SQLite/Turso database switching, and mobile-first inventory analytics.
+  *Destaques:* Arquitetura em quatro camadas desacopladas (UI → Route Handlers → Serviços de Domínio → Prisma), alternância transparente entre SQLite local e Turso em produção, e métricas financeiras adaptadas para mobile.
 
-* **[Full-Stack Community Welfare & Adoption Management System](frontend-and-web-apps/community-welfare-adoption-platform/README.md)**  
+* **[Sistema Full-Stack para Gestão de Adoções e Bem-Estar Comunitário](frontend-and-web-apps/community-welfare-adoption-platform/README.md)**  
   *Stack:* React · Node.js · Express · MongoDB · Docker · Nginx · GitHub Actions  
-  *Highlights:* Micro-scale full-stack architecture, configurable multi-origin CORS, role-based review workflows, and containerized cloud deployment.
+  *Destaques:* Arquitetura full-stack desacoplada, configuração dinâmica de CORS para múltiplos domínios, fluxos de aprovação por papéis e publicação automatizada em servidores Linux.
 
 ---
 
-### 4. [3D Graphics, WebGL & Simulation](3d-graphics-and-simulation/README.md)
-* **[First-Person 3D WebGL Clinical Laboratory & Physics Simulation](3d-graphics-and-simulation/clinical-lab-webgl-physics-simulation/README.md)**  
+### 4. [Computação Gráfica 3D, WebGL e Simulação](3d-graphics-and-simulation/README.md)
+* **[Laboratório Clínico Virtual 3D em WebGL com Simulação Física em Primeira Pessoa](3d-graphics-and-simulation/clinical-lab-webgl-physics-simulation/README.md)**  
   *Stack:* Three.js · React Three Fiber · Rapier 3D (Wasm) · TypeScript · Vite · Playwright E2E  
-  *Highlights:* First-person 3D physics interaction, 1:1 camera-aligned quaternion object inspection without gimbal lock or drift, depth-of-field bokeh blur, and centrifuge/incubator finite-state machines.
+  *Destaques:* Interação física tridimensional, inspeção de amostras com quatérnions 1:1 sem travamento de cardan (gimbal lock), profundidade de campo com desfoque bokeh e máquinas de estado para centrífugas e incubadoras.
 
-* **[Multi-User Real-Time Simulation Engine & Space Flight Telemetry](3d-graphics-and-simulation/multiplayer-space-flight-simulation/README.md)**  
+* **[Motor de Simulação Espacial Cooperativa Multiusuário em Tempo Real](3d-graphics-and-simulation/multiplayer-space-flight-simulation/README.md)**  
   *Stack:* React 19 · TypeScript · Vite · Three.js · Socket.IO · Neon PostgreSQL · Drizzle ORM  
-  *Highlights:* Multi-user cooperative planetary outpost survival simulation, interactive launch scene, real-time radiation shielding telemetry calibrated against actual space radiation data.
+  *Destaques:* Simulação cooperativa de sobrevivência planetária, sequência de lançamento interativa e telemetria de radiação calibrada com dados espaciais reais.
 
-* **[Zero-Asset Procedural 2D Isometric Healthcare Training Simulation](3d-graphics-and-simulation/procedural-2d-isometric-health-sim/README.md)**  
+* **[Simulação Educacional Isométrica 2D sem Dependência de Imagens Externas](3d-graphics-and-simulation/procedural-2d-isometric-health-sim/README.md)**  
   *Stack:* JavaScript · React · HTML5 Canvas 2D · Web Audio API  
-  *Highlights:* Completely procedural 2D isometric rendering without external image assets, real-time Web Audio API music synthesis, and healthcare community territory navigation.
+  *Destaques:* Renderização isométrica totalmente procedural em vetor sem arquivos externos de imagem, síntese sonora em tempo real via osciladores da Web Audio API e navegação territorial de saúde comunitária.
 
 ---
 
-### 5. [Data Engineering & Privacy](data-engineering-and-privacy/README.md)
-* **[Scalable Clinical Record Ingestion & PII Sanitization Architecture](data-engineering-and-privacy/clinical-record-pii-sanitization/README.md)**  
+### 5. [Engenharia de Dados e Privacidade](data-engineering-and-privacy/README.md)
+* **[Ingestão Escalável de Prontuários Clínicos e Sanitização de Dados Sensíveis (PII)](data-engineering-and-privacy/clinical-record-pii-sanitization/README.md)**  
   *Stack:* Python · Flask · PostgreSQL · Docker · Nginx  
-  *Highlights:* High-stakes patient PII sanitization (eliminating citizen tax IDs from URLs, query strings, and logs), O(1) memory streaming CSV reader for tens of thousands of citizen records, and risk stratification algorithms.
+  *Destaques:* Expurgamento completo de CPFs de URLs e logs de servidores, leitor de CSV em streaming com consumo constante O(1) de memória para cadastros volumosos e algoritmos de estratificação de risco epidemiológico.
 
 ---
 
-### 6. [Full-Stack & Monorepos](fullstack-and-monorepos/README.md)
-* **[Interactive Degree Curriculum Graph Engine & Collaborative Whiteboard](fullstack-and-monorepos/academic-curriculum-dag-whiteboard/README.md)**  
+### 6. [Full-Stack e Monorepos](fullstack-and-monorepos/README.md)
+* **[Motor Gráfico de Matrizes Curriculares e Quadro Branco Colaborativo](fullstack-and-monorepos/academic-curriculum-dag-whiteboard/README.md)**  
   *Stack:* TypeScript · Node.js · Express · React 19 · Vite · Prisma · PostgreSQL · MinIO · Docker · Zod  
-  *Highlights:* Monorepo architecture, idempotent analytics event ingestion, real-time concurrency control in digital whiteboard canvas, and graph memoization for degree curriculum flowcharts.
+  *Destaques:* Estrutura em monorepo, pipeline de eventos idempotente para analytics, controle de concorrência em tela de desenho digital e memoização de grafos curriculares.
 
 ---
 
-### 7. [Embedded Systems & IoT](embedded-systems-and-iot/README.md)
-* **[Real-Time Environmental Telemetry Firmware & Event-Driven Dashboard](embedded-systems-and-iot/real-time-air-quality-iot-telemetry/README.md)**  
+### 7. [Sistemas Embarcados e IoT](embedded-systems-and-iot/README.md)
+* **[Firmware para Telemetria Ambiental e Painel em Tempo Real Orientado a Eventos](embedded-systems-and-iot/real-time-air-quality-iot-telemetry/README.md)**  
   *Stack:* C++ · ESP32 · Eclipse Mosquitto MQTT · Node.js · Express · EJS · Server-Sent Events (SSE)  
-  *Highlights:* Embedded firmware sampling gas and particulate sensors at 1 Hz with 30s telemetry dispatch, paired with an SSR Node.js dashboard streaming updates via SSE.
+  *Destaques:* Firmware em C++ com amostragem de sensores a 1 Hz e envio a cada 30 segundos, integrado a painel web com Server-Sent Events eliminando polling constante.

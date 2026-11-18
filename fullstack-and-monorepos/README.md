@@ -1,15 +1,15 @@
-# Full-Stack & Monorepos Case Studies
+# Estudos de Caso em Full-Stack e Monorepos
 
-This category presents large-scale web platforms architected as TypeScript monorepos, focusing on shared type contracts, reactive directed acyclic graphs (DAGs), collaborative whiteboard canvas engines, and idempotent analytics pipelines.
+Esta categoria apresenta plataformas web de grande porte estruturadas como monorepos TypeScript, com foco em contratos tipados compartilhados, grafos acíclicos dirigidos (DAGs), mecanismos de tela digital colaborativa e ingestão de eventos analíticos com idempotência.
 
 ---
 
-## Case Studies in this Track
+## Estudos de Caso nesta Trilha
 
-### 1. [Interactive Degree Curriculum Graph Engine & Collaborative Whiteboard](academic-curriculum-dag-whiteboard/README.md)
-* **Core Themes:** TypeScript Monorepos (npm workspaces), Directed Acyclic Graphs, Collaborative Whiteboard Persistence, Idempotent Event Ingestion.
-* **Key Challenges:**
-  - Designing a single-writer write-behind queue for a digital canvas to decouple 60 FPS drawing strokes from asynchronous database persistence.
-  - Optimizing interactive curriculum dependency graphs by profiling React render trees, memoizing expensive subtrees, and flattening heavy CSS glow filters on mobile GPUs.
-  - Building an idempotent analytics ingestion service enforcing consistent transactional locks and cohort retention reporting.
-* **Technologies:** TypeScript, Node.js, Express, React 19, Vite, Prisma ORM, PostgreSQL, MinIO (S3), Docker, Zod.
+### 1. [Motor Gráfico de Matrizes Curriculares e Quadro Branco Colaborativo](academic-curriculum-dag-whiteboard/README.md)
+* **Temas Centrais:** Monorepos TypeScript (npm workspaces), Grafos Acíclicos Dirigidos, Persistência de Quadro Branco Colaborativo, Ingestão Idempotente de Eventos.
+* **Principais Desafios:**
+  - Criação de fila write-behind com escritor único para desacoplar o desenho a 60 FPS da persistência no banco de dados.
+  - Otimização do grafo de pré-requisitos curriculares corrigindo árvores de memoização no React e simplificando filtros CSS pesados em dispositivos móveis.
+  - Construção de serviço de ingestão idempotente de telemetria com travas transacionais e agregação de retenção por coortes.
+* **Tecnologias:** TypeScript, Node.js, Express, React 19, Vite, Prisma ORM, PostgreSQL, MinIO (S3), Docker, Zod.

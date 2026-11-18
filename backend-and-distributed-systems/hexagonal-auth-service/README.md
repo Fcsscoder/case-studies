@@ -1,30 +1,30 @@
-# Case Study 08: Hexagonal Architecture Identity & Access Management Microservice
+# Estudo de Caso 08: Microsserviço de Gestão de Identidade e Acesso em Arquitetura Hexagonal
 
-## 1. Overview
-This case study examines the architectural refactoring, token lifecycle security, and formal authorization testing of a standalone Identity and Access Management (IAM) microservice. Engineered with Node.js and TypeScript, the service implements Hexagonal Architecture (Ports and Adapters) and Clean Architecture principles, establishing a resilient authentication core decoupled from web frameworks and persistence technologies.
+## 1. Visão Geral
+Este estudo de caso aborda a refatoração de arquitetura, a segurança do ciclo de vida de tokens e os testes de autorização de um microsserviço independente de Gestão de Identidade e Acesso (IAM). Desenvolvido em Node.js e TypeScript, o serviço adota os princípios de Arquitetura Hexagonal (Ports and Adapters) e Clean Architecture, estabelecendo um núcleo de autenticação resiliente e completamente isolado de frameworks web e bancos de dados.
 
-## 2. Context and Problem
-The host platform coordinates multiple distributed research cohorts comprising instructors, field tutors, researchers, and system administrators. Earlier authentication code mixed database access directly inside HTTP route controllers, hindering automated unit testing and creating severe coupling. More critically, high-concurrency client environments (such as multiple simultaneous SPA requests) frequently produced race conditions during single-use refresh token rotation, causing valid user sessions to be accidentally invalidated and abruptly logged out.
+## 2. Contexto e Problema
+A plataforma atende a múltiplos grupos regionais de pesquisa compostos por orientadores, tutores de campo, estudantes e administradores. Códigos legados realizavam consultas a bancos diretamente dentro de controladores HTTP, dificultando a automação de testes unitários e gerando forte acoplamento. Em cenários de alta concorrência (como múltiplas requisições paralelas enviadas por uma aplicação SPA), ocorriam condições de corrida durante a renovação de tokens de uso único, causando encerramento indevido de sessões ativas de usuários.
 
 ```mermaid
 graph TD
-    subgraph Infrastructure ["Infrastructure Layer (Adapters)"]
-        HTTP["Express HTTP Controllers"]
-        DB["PostgreSQL Repositories / Relational Drivers"]
-        TokenGen["Cryptographic Token Service"]
+    subgraph Infrastructure ["Camada de Infraestrutura (Adaptadores)"]
+        HTTP["Controladores HTTP Express"]
+        DB["Repositórios PostgreSQL / Drivers Relacionais"]
+        TokenGen["Serviço de Criptografia de Tokens"]
     end
 
-    subgraph Application ["Application Layer (Use Cases & Ports)"]
-        LoginUC["Login Use Case"]
-        RefreshUC["Token Rotation Use Case"]
-        InviteUC["Cohort Invite Use Case"]
-        Ports["Repository & Crypto Interfaces (Ports)"]
+    subgraph Application ["Camada de Aplicação (Casos de Uso e Portas)"]
+        LoginUC["Caso de Uso: Login"]
+        RefreshUC["Caso de Uso: Renovação de Token"]
+        InviteUC["Caso de Uso: Convite para Grupo"]
+        Ports["Interfaces de Repositório e Criptografia (Portas)"]
     end
 
-    subgraph Domain ["Domain Layer (Core Entities & Rules)"]
-        User["User Entity"]
-        Token["RefreshToken Entity"]
-        Policy["Cohort Access Policies"]
+    subgraph Domain ["Camada de Domínio (Entidades e Regras de Negócio)"]
+        User["Entidade de Usuário"]
+        Token["Entidade de RefreshToken"]
+        Policy["Políticas de Acesso a Grupos"]
     end
 
     HTTP --> LoginUC
@@ -36,66 +36,66 @@ graph TD
     LoginUC --> User
     RefreshUC --> Token
     InviteUC --> Policy
-    DB -.->|Implements| Ports
-    TokenGen -.->|Implements| Ports
+    DB -.->|Implementa| Ports
+    TokenGen -.->|Implementa| Ports
 ```
 
-## 3. My Contributions
-- **Established Hexagonal / Clean Architecture:** Refactored the service into concentric layers (`domain`, `application`, `infrastructure`), defining strict ports (interfaces) for repositories and cryptographic services, enabling fast, isolated unit testing with in-memory doubles.
-- **Engineered Concurrent Refresh Token Rotation:** Solved race conditions during automatic token refresh by introducing a graceful rotation grace window and atomic database revocation, preventing simultaneous requests from invalidating valid sessions.
-- **Conducted Mutation Testing on Authorization Policies:** Implemented mutation testing suites for group composition rules, membership invitations, and claims generation, ensuring authorization gates cannot be bypassed by subtle conditional alterations.
-- **Hardened System Resilience Against Database Glitches:** Implemented transient error recovery, circuit-breaking logic, and secure fallbacks to ensure user authentication checks fail closed rather than leaking access during database disruptions.
-- **Built Role-Based Group Administration:** Implemented hierarchical claims for group tutors, administrative route guards, and idempotent database seed scripts for integration testing.
+## 3. Minhas Contribuições
+- **Adoção de Arquitetura Hexagonal / Clean Architecture:** Estruturei o serviço em camadas concêntricas (`domain`, `application`, `infrastructure`), estabelecendo interfaces bem delimitadas (portas) para repositórios e serviços de criptografia, o que viabilizou testes rápidos e isolados usando implementações em memória.
+- **Tratamento Concorrente de Renovação de Tokens:** Eliminei condições de corrida no processo de rotação atômica de refresh tokens por meio de uma janela curta de tolerância e revogação atômica no banco, prevenindo quedas involuntárias de sessão.
+- **Testes de Mutação em Políticas de Autorização:** Submeti as regras de composição de grupos, convites de membros e concessão de papéis a baterias de testes de mutação, garantindo que alterações sutis em operadores lógicos sejam detectadas pela suite de testes.
+- **Resiliência a Instabilidades Temporárias no Banco de Dados:** Implementei políticas de recuperação de falhas transitórias e mecanismos que asseguram que verificações de autenticação falhem com fechamento seguro em caso de indisponibilidade de persistência.
+- **Gestão Hierárquica de Permissões:** Desenvolvi regras de acesso baseadas em papéis para tutores de grupos, filtros de rotas administrativas e rotinas idempotentes de carga inicial para testes de integração.
 
-## 4. Technical Architecture
-Dependencies strictly point inwards toward the core domain:
+## 4. Arquitetura Técnica
+As dependências apontam rigorosamente para o centro, na direção do domínio:
 
 ```mermaid
 sequenceDiagram
-    participant Client as Web/Mobile Client
-    participant Controller as HTTP Adapter
-    participant UseCase as Token Rotation Use Case
-    participant Repo as Token Repository Port
-    participant PG as PostgreSQL Adapter
+    participant Client as Cliente Web / Mobile
+    participant Controller as Adaptador HTTP
+    participant UseCase as Caso de Uso de Rotação
+    participant Repo as Porta de Repositório
+    participant PG as Adaptador PostgreSQL
 
-    Client->>Controller: POST /auth/refresh (RefreshToken cookie)
+    Client->>Controller: POST /auth/refresh (Cookie RefreshToken)
     Controller->>UseCase: execute({ refreshTokenString })
     UseCase->>Repo: findByTokenWithLock(tokenId)
     Repo->>PG: SELECT FOR UPDATE
-    PG-->>Repo: Token record
-    UseCase->>UseCase: Verify expiration & revocation state
-    UseCase->>Repo: Revoke old token & generate child token
-    Repo->>PG: Atomic transaction commit
-    PG-->>Repo: Acknowledged
-    UseCase-->>Controller: New { AccessToken, RefreshToken }
+    PG-->>Repo: Registro do Token
+    UseCase->>UseCase: Valida expiração e estado de revogação
+    UseCase->>Repo: Revoga token antigo e gera token sucessor
+    Repo->>PG: Commit de transação atômica
+    PG-->>Repo: Confirmado
+    UseCase-->>Controller: Novos { AccessToken, RefreshToken }
     Controller-->>Client: Set-Cookie (Strict, HttpOnly)
 ```
 
-## 5. Technology Stack
-- **Language & Architecture:** TypeScript, Hexagonal Architecture (Ports and Adapters).
-- **Core Frameworks:** Node.js, Express.js, Zod (schema validation).
-- **Persistence & Security:** PostgreSQL, JWT, Bcrypt.
-- **Testing & Verification:** Jest (unit & in-memory integration), Mutation Testing (Stryker patterns).
-- **Containerization:** Docker, Docker Compose.
+## 5. Stack Tecnológica
+- **Linguagem e Arquitetura:** TypeScript, Arquitetura Hexagonal (Ports and Adapters).
+- **Frameworks e Validação:** Node.js, Express.js, Zod (validação de esquemas).
+- **Persistência e Segurança:** PostgreSQL, JWT, Bcrypt.
+- **Testes e Qualidade:** Jest (testes unitários e de integração em memória), Testes de Mutação (padrões Stryker).
+- **Contêineres:** Docker, Docker Compose.
 
-## 6. Engineering Challenges
-### 1. Session Revocation Collisions During Rapid Parallel Page Loads
-*Problem:* When a user loaded a dashboard with multiple concurrent AJAX requests while their access token was expired, multiple requests simultaneously attempted to rotate the single-use refresh token. The first succeeded, but the subsequent requests detected a used token, triggered security alerts, and logged the user out.
-*Solution:* Implemented an atomic database token consumption lock paired with a brief, strictly bounded grace period for concurrent in-flight requests originating from the exact same client handshake, allowing legitimate parallel requests to succeed while still preventing token reuse attacks.
+## 6. Desafios de Engenharia
+### 1. Colisão na Revogação de Sessão em Carregamentos Paralelos
+*Problema:* Ao carregar um painel com diversas requisições AJAX simultâneas enquanto o access token estava expirado, várias chamadas tentavam renovar o refresh token de uso único ao mesmo tempo. A primeira concluía com êxito, mas as seguintes identificavam o token já utilizado, interpretavam como reutilização indevida e encerravam a sessão do usuário.
+*Solução:* Implementei uma trava atômica de consumo no banco combinada a uma janela de carência estritamente delimitada para requisições concorrentes da mesma origem, viabilizando requisições simultâneas legítimas sem comprometer a defesa contra ataques de repetição.
 
-### 2. Validating Complex Multi-Tenant Authorization Rules
-*Problem:* Tutors needed permissions to review student articles within their own working group, but were strictly forbidden from viewing or approving submissions from other working groups. Standard unit tests often missed boundary flaws in multi-condition authorization logic.
-*Solution:* Applied mutation testing against the authorization policy engine, deliberately mutating comparison operators and logical branches to verify that the test suite caught 100% of potential permission leaks.
+### 2. Validação Rigorosa de Regras de Acesso Multi-Tenant
+*Problema:* Tutores precisavam de autorização para avaliar produções acadêmicas do seu próprio grupo de trabalho, mas deviam ser estritamente bloqueados de consultar ou aprovar artigos de outros grupos. Testes unitários comuns frequentemente não cobriam todos os casos de borda em condições múltiplas.
+*Solução:* Apliquei testes de mutação no mecanismo de autorização, alterando propositalmente operadores de comparação e ramos lógicos para comprovar que a bateria de testes detectava 100% de eventuais vazamentos de acesso.
 
-## 7. Engineering Practices
-- **Strict Inversion of Control:** Core domain entities and use cases have zero imports of Express, database drivers, or third-party web libraries.
-- **Deterministic In-Memory Test Fixtures:** Developed fast in-memory repository implementations allowing the entire authentication test suite to run in milliseconds without launching a database container.
-- **Zero Secret Hardcoding:** Environment configuration validated at boot time via Zod schemas, halting execution immediately if cryptographic secrets fail strength requirements.
+## 7. Práticas de Engenharia
+- **Inversão de Controle Estrita:** As entidades do domínio e casos de uso não importam Express, drivers de banco de dados nem bibliotecas de rede externas.
+- **Testes Determinísticos com Mocks em Memória:** Implementações em memória dos repositórios permitem que toda a bateria de testes de autenticação execute em poucos milissegundos sem depender de contêineres de banco de dados ativos.
+- **Validação de Variáveis de Ambiente no Boot:** Configurações críticas são avaliadas na inicialização via esquemas Zod, interrompendo a execução se as chaves criptográficas não atenderem aos requisitos de complexidade.
 
-## 8. Results and Impact
-- **23 verified commits** establishing the architectural foundation, token rotation mechanics, mutation test suites, and group authorization logic.
-- Complete elimination of false-positive session logouts under concurrent network loads.
-- Proven authorization engine guaranteeing strict data isolation between regional research groups.
+## 8. Resultados e Impacto
+- **23 commits verificados** estabelecendo a estrutura de arquitetura, rotação atômica de tokens, suites de teste de mutação e regras de autorização de grupos.
+- Fim definitivo dos falsos positivos de encerramento de sessão sob tráfego concorrente.
+- Motor de autorização formalmente validado, assegurando isolamento de dados entre grupos regionais.
 
-## 9. My Role
-Core Backend Engineer and Security Architect. Responsible for the architectural structure, token lifecycle mechanics, mutation testing, and authorization policy implementation.
+## 9. Meu Papel
+Engenheiro Backend e Arquiteto de Segurança. Responsável pela modelagem de arquitetura, mecânicas do ciclo de vida dos tokens, automação dos testes de mutação e implementação das regras de controle de acesso.

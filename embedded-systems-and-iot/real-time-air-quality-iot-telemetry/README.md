@@ -1,82 +1,82 @@
-# Case Study 10: Real-Time Environmental Telemetry Firmware & Event-Driven Dashboard
+# Estudo de Caso 10: Firmware para Telemetria Ambiental e Painel em Tempo Real Orientado a Eventos
 
-## 1. Overview
-This case study examines the development of an integrated Internet of Things (IoT) air quality monitoring ecosystem. The system comprises embedded C++ firmware running on an ESP32 microcontroller, an Eclipse Mosquitto MQTT broker, an event subscriber service, and a Node.js dashboard featuring server-side rendering (SSR) and real-time telemetry streaming via Server-Sent Events (SSE).
+## 1. Visão Geral
+Este estudo de caso documenta o desenvolvimento de um ecossistema integrado de monitoramento de qualidade do ar baseado em Internet das Coisas (IoT). O projeto é formado por um firmware embarcado em C++ executado em um microcontrolador ESP32, um broker MQTT Eclipse Mosquitto, um serviço ouvinte de auditoria e um painel web em Node.js com renderização no servidor (SSR) e transmissão contínua de telemetria via Server-Sent Events (SSE).
 
-## 2. Context and Problem
-Monitoring indoor environmental safety requires continuous sampling of volatile organic compounds, hazardous gases (via MQ135 sensors), and particulate matter (via PM2.5 optical dust sensors). Traditional polling architectures place excessive connection strain on low-power microcontrollers and web clients. The goal was to establish an event-driven pub/sub topology where low-power edge devices sample continuously while transmitting at optimized intervals, and client dashboards receive push updates without periodic polling.
+## 2. Contexto e Problema
+A avaliação da salubridade do ar em ambientes internos exige leitura contínua de gases inflamáveis ou tóxicos (via sensores analógicos MQ135) e concentração de material particulado fino (via sensores ópticos PM2.5). Arquiteturas baseadas em polling contínuo geram sobrecarga de conexão em microcontroladores de baixo consumo e nos clientes web. O objetivo foi estabelecer uma topologia orientada a eventos (pub/sub) onde os nós embarcados leem os dados de forma ininterrupta, transmitem em intervalos otimizados e a interface web recebe as atualizações instantaneamente por push.
 
 ```mermaid
 graph LR
-    ESP32["ESP32 Microcontroller<br/>(C++ Firmware / Sensors)"]
-    Broker["Eclipse Mosquitto<br/>(MQTT Broker :1883)"]
-    Subscriber["Node.js Console Subscriber<br/>(Debug & Audit)"]
-    Dashboard["Node.js Express Server<br/>(SSR HTML + State Engine)"]
-    Browser["Client Web Browser<br/>(HTML5 Canvas + SSE Stream)"]
+    ESP32["Microcontrolador ESP32<br/>(Firmware C++ / Sensores)"]
+    Broker["Eclipse Mosquitto<br/>(Broker MQTT Porta 1883)"]
+    Subscriber["Ouvinte em Console Node.js<br/>(Depuração e Auditoria)"]
+    Dashboard["Servidor Node.js / Express<br/>(HTML com SSR e Estado)"]
+    Browser["Navegador Web do Usuário<br/>(HTML5 Canvas e Fluxo SSE)"]
 
-    ESP32 -->|MQTT Telemetry (30s)| Broker
-    Broker -->|Topic Subscription| Subscriber
-    Broker -->|Topic Subscription| Dashboard
-    Dashboard -->|Initial SSR View| Browser
-    Dashboard -->|Push Live Events via SSE| Browser
+    ESP32 -->|Telemetria MQTT (30s)| Broker
+    Broker -->|Assinatura de Tópico| Subscriber
+    Broker -->|Assinatura de Tópico| Dashboard
+    Dashboard -->|Página Inicial com SSR| Browser
+    Dashboard -->|Envio de Eventos via SSE| Browser
 ```
 
-## 3. My Contributions
-- **Authored the ESP32 Microcontroller Firmware:** Wrote modular C++ Arduino firmware for ESP32, configuring WiFi connectivity, PubSubClient MQTT communication, analog sensor sampling at 1 Hz, and batched JSON telemetry payload dispatch every 30 seconds.
-- **Configured Containerized Mosquitto MQTT Broker:** Defined Docker Compose topologies orchestrating the Eclipse Mosquitto message broker, establishing custom port listeners and network isolation.
-- **Engineered an SSR Web Dashboard with Server-Sent Events (SSE):** Developed a Node.js Express application utilizing EJS templating for instant server-rendered initial loads, combined with an active SSE endpoint (`/events`) streaming telemetry updates directly into client-side Canvas charts without page refreshes.
-- **Implemented Sensor Calibration & Environmental Classification:** Implemented baseline calibration curves for gas resistance ratios and particulate density calculations, categorizing ambient air quality into qualitative safety thresholds (Good, Moderate, Poor).
+## 3. Minhas Contribuições
+- **Desenvolvimento do Firmware Embarcado para ESP32:** Escrevi firmware modular em C++ para ESP32 com o framework Arduino, programando reconexão Wi-Fi, comunicação MQTT com a biblioteca PubSubClient, leitura de sensores a 1 Hz e envio de pacotes estruturados em JSON a cada 30 segundos.
+- **Configuração do Broker MQTT Mosquitto em Contêiner:** Defini as configurações do broker Eclipse Mosquitto via Docker Compose, ajustando portas de escuta e isolamento de rede interna.
+- **Construção de Painel Web SSR com Server-Sent Events (SSE):** Desenvolvi a aplicação em Node.js e Express com templates EJS para entrega imediata do HTML inicial renderizado no servidor, integrada a um endpoint de SSE (`/events`) que transmite os dados diretamente para os gráficos do navegador.
+- **Calibração e Classificação dos Níveis de Qualidade do Ar:** Implementei curvas de calibração baseadas nas características elétricas dos sensores para calcular densidade de partículas e níveis de gases, categorizando o ambiente em faixas de qualidade (Boa, Moderada, Ruim).
 
-## 4. Technical Architecture
-The telemetry pipeline isolates hardware dispatch from client rendering:
+## 4. Arquitetura Técnica
+O fluxo de telemetria desacopla as transmissões do hardware do consumo nos navegadores:
 
 ```mermaid
 sequenceDiagram
-    participant Hardware as ESP32 Device
-    participant Broker as Mosquitto Broker
-    participant Server as Express Dashboard
-    participant Client as Web Browser
+    participant Hardware as Dispositivo ESP32
+    participant Broker as Broker Mosquitto
+    participant Server as Servidor do Painel
+    participant Client as Navegador Web
 
     Client->>Server: HTTP GET /
-    Server-->>Client: 200 OK (SSR HTML + Canvas chart boilerplate)
-    Client->>Server: Open EventSource connection (/events)
-    Server-->>Client: HTTP 200 (text/event-stream established)
+    Server-->>Client: 200 OK (HTML renderizado com estrutura do Canvas)
+    Client->>Server: Abre conexão EventSource (/events)
+    Server-->>Client: HTTP 200 (Conexão text/event-stream ativa)
     
-    loop Every 30 Seconds
-        Hardware->>Hardware: Sample MQ135 & PM2.5 analog pins
-        Hardware->>Broker: MQTT PUBLISH telemetry/air_quality (JSON payload)
-        Broker->>Server: Deliver MQTT message
-        Server->>Server: Update state & evaluate safety threshold
-        Server->>Client: SSE Push data: { "pm25": 14.2, "airQuality": "Good" }
-        Client->>Client: Redraw real-time Canvas strip chart
+    loop A Cada 30 Segundos
+        Hardware->>Hardware: Amostra pinos analógicos dos sensores
+        Hardware->>Broker: MQTT PUBLISH telemetria/qualidade_ar (Payload JSON)
+        Broker->>Server: Entrega pacote MQTT
+        Server->>Server: Atualiza estado e avalia classificação de risco
+        Server->>Client: Envio push via SSE: { "pm25": 14.2, "qualidade": "Boa" }
+        Client->>Client: Atualiza traçado do gráfico no Canvas
     end
 ```
 
-## 5. Technology Stack
-- **Embedded & Hardware:** C++, Arduino framework, ESP32 DevKit, PubSubClient, Wokwi simulation environment.
-- **Messaging:** Eclipse Mosquitto MQTT Broker.
-- **Backend & Web:** Node.js, Express.js, EJS (Server-Side Rendering), Server-Sent Events (SSE).
-- **Frontend:** Vanilla JavaScript, HTML5 Canvas API, CSS3.
-- **Infrastructure:** Docker, Docker Compose.
+## 5. Stack Tecnológica
+- **Embarcados e Hardware:** C++, Framework Arduino, ESP32 DevKit, PubSubClient, ambiente de simulação Wokwi.
+- **Mensageria:** Broker MQTT Eclipse Mosquitto.
+- **Backend e Servidor Web:** Node.js, Express.js, EJS (Server-Side Rendering), Server-Sent Events (SSE).
+- **Frontend:** JavaScript Vanilla, HTML5 Canvas API, CSS3.
+- **Infraestrutura:** Docker, Docker Compose.
 
-## 6. Engineering Challenges
-### 1. Reconciling High-Frequency Sensor Reads with Network Efficiency
-*Problem:* Continuous WiFi transmissions on microcontrollers cause significant power dissipation and network congestion, while low-frequency sampling risks missing sudden hazardous gas spikes.
-*Solution:* Implemented an internal decoupled sampling loop: the firmware samples analog pins at 1 Hz into a moving-average buffer, detecting sudden threshold exceedances immediately, while dispatching steady-state MQTT packets only once every 30 seconds.
+## 6. Desafios de Engenharia
+### 1. Conciliar Alta Frequência de Amostragem com Baixo Consumo de Rede
+*Problema:* Transmissões contínuas por Wi-Fi em microcontroladores aumentam o aquecimento e o consumo de energia, mas leituras esparsas poderiam perder picos momentâneos de fumaça ou gás.
+*Solução:* Separei a leitura da transmissão: o firmware amostra os pinos analógicos a 1 Hz acumulando valores em uma média móvel para detectar aumentos abruptos imediatamente, enquanto o pacote consolidado de telemetria é despachado via MQTT apenas uma vez a cada 30 segundos.
 
-### 2. Client-Side Overhead in Real-Time Web Graphing
-*Problem:* Heavy third-party charting libraries caused substantial CPU overhead and DOM churn when updating live real-time streams in browser tabs left open for days.
-*Solution:* Built a lightweight, custom HTML5 Canvas rendering engine with zero third-party framework overhead, drawing smooth time-series charts directly onto an offscreen canvas buffer.
+### 2. Sobrecarga de Renderização em Gráficos em Tempo Real
+*Problema:* Bibliotecas complexas de gráficos para navegadores geravam alto consumo de memória e processamento ao atualizar dados contínuos durante longos períodos de monitoramento.
+*Solução:* Desenvolvi um motor gráfico sob medida utilizando diretamente a API HTML5 Canvas, desenhando os pontos temporais em uma tela em buffer sem dependências externas nem manipulação do DOM.
 
-## 7. Engineering Practices
-- **Decoupled Subscriber Architecture:** Maintained an independent headless Node.js subscriber container to log and audit raw broker traffic without interfering with dashboard HTTP rendering.
-- **Containerized Development Parity:** Packaged the entire stack (broker, subscriber, web server) into a multi-container Docker Compose configuration capable of bootstrapping with a single command.
-- **Zero-Polling SSE Communication:** Eliminated repetitive HTTP polling by utilizing unidirectional Server-Sent Events over a persistent HTTP/1.1 connection.
+## 7. Práticas de Engenharia
+- **Serviço Ouvinte Desacoplado:** Manutenção de um processo independente em Node.js para registrar mensagens brutas do broker sem interferir nas rotas web do painel.
+- **Ambiente de Desenvolvimento em Contêineres:** Integração do broker, do ouvinte e do painel web em um manifesto Docker Compose único, permitindo subir todo o sistema com um comando.
+- **Comunicação por Push sem Polling:** Utilização de Server-Sent Events sobre uma única conexão HTTP persistente, eliminando requisições repetitivas ao servidor.
 
-## 8. Results and Impact
-- **3 verified commits** establishing the complete hardware firmware, MQTT broker setup, and real-time SSE dashboard.
-- Stable real-time telemetry streaming with sub-50ms latency from broker receipt to browser visual update.
-- Completely reproducible Docker test environment for MQTT IoT applications.
+## 8. Resultados e Impacto
+- **3 commits verificados** estabelecendo o firmware completo, a infraestrutura do broker MQTT e o painel em tempo real.
+- Transmissão contínua de medições com latência inferior a 50 ms entre a chegada no broker e a atualização na tela.
+- Ambiente de simulação e execução com contêineres totalmente reproduzível para aplicações IoT.
 
-## 9. My Role
-Sole Systems Engineer and Firmware Developer. Authored the ESP32 C++ firmware, configured the Mosquitto broker, and developed the real-time Node.js dashboard.
+## 9. Meu Papel
+Engenheiro de Sistemas e Desenvolvedor de Firmware Único. Programei o firmware em C++ para ESP32, estruturei o broker Mosquitto e desenvolvi a aplicação web com SSE.

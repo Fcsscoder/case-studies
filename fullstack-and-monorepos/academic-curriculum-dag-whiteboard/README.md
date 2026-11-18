@@ -1,80 +1,80 @@
-# Case Study 01: Interactive Degree Curriculum Graph Engine & Collaborative Whiteboard
+# Estudo de Caso 01: Motor Gráfico de Matrizes Curriculares e Quadro Branco Colaborativo
 
-## 1. Overview
-This case study examines the engineering of a full-stack educational planning platform built to model higher-education degree curricula as reactive directed acyclic graphs (DAGs), complemented by an infinite collaborative whiteboard for visual study scheduling. Architected as a TypeScript monorepo using npm workspaces, the system pairs a high-throughput Express/Prisma API with a responsive React 19 / Vite client.
+## 1. Visão Geral
+Este estudo de caso aborda a engenharia de uma plataforma educacional de planejamento acadêmico, projetada para representar matrizes curriculares do ensino superior como grafos acíclicos dirigidos (DAGs) interativos, complementada por um quadro branco colaborativo infinito para planejamento visual de estudos. Desenvolvido como um monorepo TypeScript com npm workspaces, o sistema integra uma API em Express e Prisma de alta capacidade a um cliente responsivo em React 19 e Vite.
 
-## 2. Context and Problem
-Academic degree programs often incorporate multi-level dependency structures where prerequisite courses, corequisites, and advisory tracks introduce substantial cognitive overhead for students. Standard enterprise university portals present academic records as static flat tables, resulting in planning ambiguity, scheduling bottlenecks, and delayed graduations. The objective was to transform complex tabular academic catalogs into an interactive graph-based planning application capable of fluid exploration on mobile and desktop devices.
+## 2. Contexto e Problema
+Grades curriculares universitárias frequentemente apresentam regras complexas de dependência onde pré-requisitos, correquisitos e linhas de formação geram sobrecarga de planejamento para os estudantes. Portais acadêmicos convencionais exibem essas informações apenas como tabelas estáticas, dificultando a visualização de trajetórias, gerando atrasos em formaturas e dúvidas de matrícula. O desafio foi converter matrizes curriculares densas em uma ferramenta visual interativa e fluida para computadores e dispositivos móveis.
 
 ```mermaid
 graph TD
-    Client["React 19 / Vite SPA (apps/web)"]
-    API["Express / Node.js API (apps/api)"]
-    Contracts["Shared Zod Contracts (packages/contracts)"]
+    Client["Aplicação React 19 / Vite (apps/web)"]
+    API["API Express / Node.js (apps/api)"]
+    Contracts["Contratos Zod Compartilhados (packages/contracts)"]
     DB[("PostgreSQL via Prisma ORM")]
-    S3[("MinIO S3-Compatible Blob Storage")]
-    Analytics["Idempotent Analytics Pipeline"]
+    S3[("Armazenamento MinIO Compatível com S3")]
+    Analytics["Pipeline de Eventos Idempotente"]
 
-    Client -->|Type-safe HTTP / TanStack Query| API
-    API -->|Schema Enforcement| Contracts
-    Client -->|Contract Validation| Contracts
-    API -->|Relational Queries| DB
-    API -->|Asset Storage| S3
-    API -->|Buffered Ingestion| Analytics
+    Client -->|HTTP Tipado / TanStack Query| API
+    API -->|Validação de Esquemas| Contracts
+    Client -->|Validação de Contratos| Contracts
+    API -->|Consultas Relacionais| DB
+    API -->|Armazenamento de Arquivos| S3
+    API -->|Ingestão com Buffer| Analytics
 ```
 
-## 3. My Contributions
-- **Engineered an Idempotent Analytics Pipeline:** Designed and implemented an event ingestion service (`ingestion.service.ts`) capable of processing telemetry streams with deduplication, database ingestion locks, and retention cohort aggregation.
-- **Architected the Collaborative Whiteboard Persistence Queue:** Developed a single-writer write-behind queue for the whiteboard tool, decoupling stroke rendering from database persistence, ensuring zero input latency while maintaining data integrity via keepalive conflict checks.
-- **Optimized the Curriculum Flowchart Graph Rendering:** Profiled and refactored the interactive curriculum graph component, correcting broken memoization trees and flattening heavy CSS glow filters on mobile and tablet devices to achieve steady 60 FPS transitions.
-- **Modeled Complex Engineering Curricula:** Codified full university degree catalogs into strongly typed YAML schemas, incorporating course identifiers, credit hours, prerequisites, and corequisite dependency rules.
-- **Hardened Container Security & CI/CD Pipelines:** Implemented automated GitHub Actions workflows with container image signing via Sigstore Cosign, vulnerability auditing via Trivy, and automated deployment to production VPS environments.
+## 3. Minhas Contribuições
+- **Engenharia de Pipeline de Eventos Analíticos Idempotente:** Projetei e programei o serviço de coleta de eventos (`ingestion.service.ts`), capaz de processar fluxos de telemetria com deduplicação, travas atômicas no banco de dados e relatórios de retenção de coortes.
+- **Arquitetura da Fila de Persistência do Quadro Branco:** Criei uma fila write-behind com escritor único que desacopla os traços desenhados na tela da persistência no banco, garantindo resposta imediata sem atrasos na renderização e mantendo a consistência via verificações periódicas.
+- **Otimização Gráfica do Fluxograma de Disciplinas:** Identifiquei gargalos de desempenho e refatorei o componente de grafo da grade, ajustando a estrutura de memoização no React e simplificando sombras e filtros CSS pesados em celulares para sustentar 60 FPS constantes.
+- **Modelagem de Matrizes Curriculares de Engenharia:** Estruturei matrizes completas de cursos universitários em esquemas YAML fortemente tipados, registrando códigos de disciplina, cargas horárias, pré-requisitos e correquisitos.
+- **Automação de CI/CD com Assinatura Criptográfica:** Configurei esteiras no GitHub Actions com assinatura de imagens de contêineres via Sigstore Cosign, análise de vulnerabilidades com Trivy e deploy em servidores VPS de produção.
 
-## 4. Technical Architecture
-The system employs a strict monorepo layout split between presentation, domain logic, and shared contracts:
+## 4. Arquitetura Técnica
+O sistema utiliza organização em monorepo com separação nítida entre interface, regras de negócio e contratos de validação:
 
 ```mermaid
 sequenceDiagram
-    participant User as User Browser
-    participant Canvas as Whiteboard Engine
-    participant Queue as Single-Writer Queue
-    participant API as Express API
+    participant User as Navegador do Usuário
+    participant Canvas as Motor do Quadro Branco
+    participant Queue as Fila com Escritor Único
+    participant API as API Express
     participant PG as PostgreSQL
 
-    User->>Canvas: Draw stroke / manipulate node
-    Canvas-->>User: Immediate 60 FPS local render (Canvas/DOM)
-    Canvas->>Queue: Push delta (debounce active)
-    Note over Queue: Coalesces continuous drawing strokes
-    Queue->>API: Periodic batch flush with Keepalive lock
-    API->>PG: Atomic upsert under tenant transaction
-    PG-->>API: Acknowledged
-    API-->>Queue: Sync confirmation
+    User->>Canvas: Desenha traço ou move elemento
+    Canvas-->>User: Renderização imediata a 60 FPS na tela
+    Canvas->>Queue: Registra alteração com debounce
+    Note over Queue: Agrupa múltiplos movimentos contínuos
+    Queue->>API: Envio em lote com trava de sessão
+    API->>PG: Atualização atômica em transação
+    PG-->>API: Confirmado
+    API-->>Queue: Confirmação de sincronização
 ```
 
-## 5. Technology Stack
+## 5. Stack Tecnológica
 - **Backend:** Node.js, TypeScript, Express.js, Prisma ORM, PostgreSQL, Zod, Pino.
 - **Frontend:** React 19, Vite, Tailwind CSS, shadcn/ui, TanStack Query, Zustand.
-- **Storage & Infrastructure:** MinIO (S3-compatible blob storage), Docker, Docker Compose.
-- **DevSecOps:** GitHub Actions, Cosign (image signing), Trivy (vulnerability scanning), GHCR.
+- **Armazenamento e Nuvem:** MinIO (compatível com S3), Docker, Docker Compose.
+- **Segurança e DevOps:** GitHub Actions, Cosign (assinatura digital de imagens), Trivy (varredura de falhas), GHCR.
 
-## 6. Engineering Challenges
-### 1. Canvas Freezes During Fast Freehand Drawing
-*Problem:* Initial iterations triggered database save calls and thumbnail generation on every pointer movement event, creating micro-stutters and frame drops during freehand drawing.
-*Solution:* Implemented an asynchronous single-writer queue that suppresses save triggers during active pointer movement, memoized the canvas stroke generation engine, and deferred thumbnail rasterization to idle browser callbacks using `requestIdleCallback`.
+## 6. Desafios de Engenharia
+### 1. Queda de Quadros Durante Desenhos Rápidos no Quadro Branco
+*Problema:* Versões iniciais disparavam gravações no banco e geração de miniaturas a cada evento de movimento do ponteiro, gerando travamentos visíveis e perda de fluidez durante desenhos livres.
+*Solução:* Implementei uma fila assíncrona com escritor único que agrupa e adia gravações durante o desenho contínuo, memoizei a geração de traços e posterguei a criação de miniaturas para momentos ociosos do navegador com `requestIdleCallback`.
 
-### 2. High-Frequency Analytics Ingestion Under Concurrent Traffic
-*Problem:* Telemetry events triggered race conditions when students updated study plans simultaneously, producing skewed engagement counts and duplicate metric increments.
-*Solution:* Established an idempotent event ingestion architecture enforcing unique event hashing, transactional database row locks, and batching to guarantee exactly-once processing semantics.
+### 2. Ingestão Concorrente de Eventos Analíticos em Horários de Pico
+*Problema:* Acessos simultâneos de alunos geravam condições de corrida nas tabelas de métricas, causando contagens incorretas e duplicação de dados de engajamento.
+*Solução:* Estruturei uma arquitetura idempotente para ingestão de eventos, aplicando hashes únicos para cada ação, transações com travas de linha no banco e agrupamento em lotes para garantir processamento exato.
 
-## 7. Engineering Practices
-- **Monorepo Contracts as Single Source of Truth:** All API request/response envelopes, enums, and domain validation schemas are centrally defined in `packages/contracts` using Zod and imported across both backend and frontend layers.
-- **Cryptographic Supply Chain Security:** Container images built for production are cryptographically signed using Cosign during CI, ensuring that only verified binaries run in production.
-- **Accessibility & Device Adaptive Rendering:** Visual indicators and glowing effects dynamically collapse into solid high-contrast borders on low-power mobile GPUs.
+## 7. Práticas de Engenharia
+- **Contratos no Monorepo como Referência Central:** Todos os esquemas de validação de requisições, respostas e enums residem em `packages/contracts` via Zod, sendo compartilhados diretamente entre a API e a interface web.
+- **Segurança da Cadeia de Suprimentos de Software:** Imagens de contêiner para produção são assinadas digitalmente com Cosign durante a esteira de CI, garantindo que apenas pacotes verificados executem em produção.
+- **Interface com Desempenho Adaptativo:** Efeitos visuais e contornos brilhantes são desativados automaticamente em dispositivos móveis com processadores gráficos mais simples.
 
-## 8. Results and Impact
-- Over **190 verified commits** establishing the core architecture, curriculum engine, whiteboard tool, and analytics pipeline.
-- Complete digitized curriculum dependency tree for Computer Engineering with automated validation of prerequisite chains.
-- Elimination of drawing latency, supporting sub-16ms frame budgets on standard browser hardware.
+## 8. Resultados e Impacto
+- Mais de **190 commits verificados** estabelecendo a base da plataforma, o motor curricular, o quadro colaborativo e o pipeline analítico.
+- Matriz completa de Engenharia de Computação modelada e validada com verificação automática de encadeamento de requisitos.
+- Ausência de atrasos perceptíveis no desenho, operando dentro do orçamento de 16 ms por quadro em computadores comuns.
 
-## 9. My Role
-Lead Architect and Core Full-Stack Developer for the platform, responsible for monorepo configuration, backend database schemas, whiteboard queue mechanics, analytics engine, and CI/CD automation.
+## 9. Meu Papel
+Arquiteto Principal e Desenvolvedor Full-Stack Líder. Responsável pela configuração do monorepo, modelagem do banco de dados, fila de sincronização do quadro branco, módulo analítico e automações de CI/CD.

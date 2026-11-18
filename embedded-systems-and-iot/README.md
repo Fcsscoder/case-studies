@@ -1,15 +1,15 @@
-# Embedded Systems & IoT Case Studies
+# Estudos de Caso em Sistemas Embarcados e IoT
 
-This category covers embedded firmware development, low-power sensor sampling, publish/subscribe messaging protocols, and event-driven web dashboard integration.
+Esta categoria explora a integração entre hardware microcontrolado, protocolos de mensageria com baixo consumo e aplicações web em tempo real para monitoramento e análise de telemetria ambiental.
 
 ---
 
-## Case Studies in this Track
+## Estudos de Caso nesta Trilha
 
-### 1. [Real-Time Environmental Telemetry Firmware & Event-Driven Dashboard](real-time-air-quality-iot-telemetry/README.md)
-* **Core Themes:** Embedded C++, ESP32 Microcontrollers, MQTT Pub/Sub, Server-Sent Events (SSE), Real-Time Canvas Graphing.
-* **Key Challenges:**
-  - Decoupling continuous 1 Hz analog sensor reads (MQ135 volatile gases and PM2.5 optical dust sensors) from batched 30-second MQTT telemetry transmissions to optimize power and network bandwidth.
-  - Streaming live telemetry from an Eclipse Mosquitto broker directly to a browser client over Server-Sent Events (SSE), eliminating client-side HTTP polling.
-  - Rendering lightweight time-series charts directly onto an HTML5 Canvas buffer without third-party library memory overhead.
-* **Technologies:** C++, Arduino/ESP32, Eclipse Mosquitto MQTT, Node.js, Express, EJS, Server-Sent Events, HTML5 Canvas.
+### 1. [Firmware para Telemetria Ambiental e Painel em Tempo Real Orientado a Eventos](real-time-air-quality-iot-telemetry/README.md)
+* **Temas Centrais:** Sistemas Embarcados, ESP32, Protocolo MQTT, Arquitetura Orientada a Eventos, Server-Sent Events.
+* **Principais Desafios:**
+  - Amostrar sensores de gases tóxicos e material particulado a 1 Hz enquanto agrupa e envia pacotes de telemetria via MQTT a cada 30 segundos, poupando energia e rede.
+  - Conectar mensagens do broker Mosquitto diretamente ao navegador via Server-Sent Events (SSE), eliminando requisições repetitivas de polling no cliente.
+  - Renderizar gráficos temporais contínuos diretamente no elemento HTML5 Canvas com consumo mínimo de memória.
+* **Tecnologias:** C++, Arduino/ESP32, Eclipse Mosquitto MQTT, Node.js, Express, EJS, Server-Sent Events, HTML5 Canvas.
